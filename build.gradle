@@ -1,17 +1,4 @@
-/*
-apply plugin: 'java'
-
-sourceCompatibility = 1.5
-version = '1.0'
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-}
-*/
+version = '0.1'
 
 buildscript {
     repositories {
@@ -25,3 +12,15 @@ buildscript {
 
 apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
+asciidoctor {
+    outputDir = new File("$buildDir/src/asciidoc")
+    options = [
+            doctype   : 'book',
+            attributes: [
+                    'source-highlighter': 'coderay',
+                    toc                 : '',
+                    idprefix            : '',
+                    idseparator         : '-'
+            ]
+    ]
+}
