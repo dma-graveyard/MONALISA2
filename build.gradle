@@ -7,6 +7,7 @@ buildscript {
 
     dependencies {
         classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.0'
+        classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.6'
     }
 }
 
@@ -14,13 +15,14 @@ apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
 asciidoctor {
     outputDir = new File("$buildDir/src/asciidoc")
+    backends = [ "html5", "pdf" ]
     options = [
-            doctype   : 'book',
-            attributes: [
-                    'source-highlighter': 'coderay',
-                    toc                 : '',
-                    idprefix            : '',
-                    idseparator         : '-'
-            ]
+        doctype   : 'book',
+        attributes: [
+            'source-highlighter': 'coderay',
+            toc                 : '',
+            idprefix            : '',
+            idseparator         : '-'
+        ]
     ]
 }
