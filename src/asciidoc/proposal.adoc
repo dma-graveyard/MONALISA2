@@ -1,14 +1,20 @@
 = Message exchange for flow management in maritime traffic management systems.
 Thomas Borg Salling <tbsalling@tbsalling.dk>
 v0.1, December 10, 2014: Document created
-:keywords: imo, iala, ais, itu-r-1371
+:keywords: imo, iala, ais, itu-r-1371, monalisa, ten-t
 :toc-placement: preamble
+:icons: font
 
-Prepared for the http://dma.dk[Danish Maritime Authority] as part of the http://monalisaproject.eu/[MONA LISA 2] project.
+Prepared by the http://dma.dk[Danish Maritime Authority] as part of the http://monalisaproject.eu/[MONA LISA 2] project.
 
 image::images/dma.png[align="center", scaledwidth="25%"]
 image::images/monalisa2.png[align="center"]
 image::images/eu.png[align="center"]
+
+[cols="1,3,3"]
+|===
+| v0.1 |Thomas Borg Salling <tbsalling@tbsalling.dk> |First draft.
+|===
 
 [abstract]
 == Abstract
@@ -17,9 +23,12 @@ image::images/eu.png[align="center"]
 :numbered:
 
 == Introduction
-As part of and as a contribution to the MONA LISA 2.0 <<MONALISA2>> project the Danish Maritime Authority has worked to define message conversation scenarios and detailed message formats for _flow management_ in the context of _sea traffic management (STM)_ <<ARCH>>.
+As part of - and as a contribution to - the MONA LISA 2.0 <<MONALISA2>> project, the Danish Maritime Authority has worked to define message conversation scenarios and detailed message formats for _flow management_ in the context of _sea traffic management (STM)_ as defined by <<ARCH>>.
+
+The resulting proposal contains inputs, contributions, and insights from DMA and project partners.
 
 This paper documents the process and the the results, by
+
 . defining the domain problem,
 . establishing design criteria,
 . proposing message conversation scenarios,
@@ -38,13 +47,170 @@ M.Sc. Jens Kristian Jensen <JKJ@dma.dk>
 ****
 
 == Design criteria
-Since the 1990's, when AIS was first incepted, a large amount of work in the field maritime messaging has been performed. In order take advantage of lessons learned and other previous experiences, a number of design criteria for the current work have been defined. The proposed design and reference implementation on flow management support complies with each of these criteria. This will be validated in <<design_validation>>.
+Since the 1990's, when AIS was first incepted, a large amount of work in the field maritime messaging has been performed. In order take advantage of lessons learned and other previous experiences, a number of design criteria for the current work are defined below.
+
+The proposed design and reference implementation on flow management support complies with each of these criteria. This will be validated in <<design_validation>>.
+
+=== General design criteria
+
+==== Design with the end-user in mind
+In accordance with <<ARCH>>, §3, all systems shall be designed with the end user (e.g. mariner, ship owner, operator), in mind.
+
+====
+This shall be achieved, by carefully identifying and defining use cases expressed in user domain terms and approved by user domain experts (such as navigators) before the actual design of message conversations and message layouts takes place.
+====
+
+==== Design for multivendor environment
+In accordance with <<ARCH>>, §3 p.6, one of the main goals (here interpreted as _design criteria_) of the MONALISA 2.0 project is to "achieve full and seamless interoperability of systems in Sea Traffic Management (STM) [...] in a multi-vendor environment".
+
+====
+This shall be achieved by ensuring that relevant stakeholders in government and industry can contribute to and review the design of conversations and messages in flow management.
+====
+
+==== Information transfer involving ships must be bandwidth efficient
+In accordance with <<ARCH>>, §7 p.23, information transfer involving ships must be highly bandwidth efficient.
+
+====
+This shall be achieved by designing messages to be as compact as possible, avoiding redundant information in message layouts, and using bit-level compression where applicable and possible.
+====
+
+==== Ship-shore interactions must be robust
+In accordance with <<ARCH>>, §7 p.23, ship-shore interactions must be robust to unstable, changing, high latency links.
+
+====
+This shall be achieved by ???
+====
+
+==== Ship-shore data IP connections must be initiated from ship
+In accordance with <<ARCH>>, §7 p.23, ship-shore data connections must be initiated from ship, to address cyber security.
+
+====
+This shall be achieved by designing the required mechanisms of communication, such that ship-to-shore communication is based on IP-based connection-oriented communication (e.g. TCP/IP), then such a connection can only be initiated from the ship-side.
+====
+
+=== AIS-specific design criteria
+
+==== Consider updated definitions of ASM and related guidance, before developing new ASM;
+In accordance with <<IALA144>>, recommendation 4, IALA recommends that members make use of the IALA ASM collection <<AISASM>> by taking into account other updated definitions of ASM and related guidance, before developing new or implementing the use of existing Regional ASM.
+
+====
+This shall be achieved by consulting the ASM collection <<AISASM>> to ensure that no other existing ASM already fulfills the requirements of any newly designed message before it is submitted for approval.
+====
+
+==== Contribute to the IALA AIS ASM collection
+In accordance with <<IALA144>>, recommendation 6, members are recommended to contribute to the IALA ASM collection through their National IALA Member.
+
+====
+This shall be achieved by ensuring that the final and agreed ASM messages to support flow management are submitted to the IALA ASM collection by the national IALA member, in this case the Danish Maritime Authority.
+====
+
+==== Low transmission frequency
+In accordance with <<AISG289>>, §3.3, the frequency of message transmission should be limited in order to prevent system overload.
+
+====
+This shall be achieved by careful design of the criteria which trigger a message transmission, in order to minimise the number of transmissions to the lowest possible.
+====
+
+==== Limit no. of VHF transmission slots
+In accordance with <<AISG289>>, §3.4, AIS messages occupying more than three (3) slots should be avoided, unless there is a low load on the VDL or a compelling reason to do so.
+
+====
+This shall be achieved by designing messages to avoid occupying more than 3 slots.
+====
+
+==== Use 6-bit ASCII
+As pointed out by <<TOILS>> the decision to use 6-bit ASCII encoding in AIS messages is a _blunder_. But as it states: "Some major defects, such as the handling of string data, are too deeply embedded to be removed". Thus in the design of new messages, the 6-bit encoding scheme will be maintained to avoid further complexity to <<AISSPEC5>> and related recommendations and guidelines.
+
+====
+This shall be achieved by designing string fields of new messages to use the 6-bit character encoding scheme defined by <<AISSPEC5>> annex 8.
+====
+
+==== Fixed length messages
+By experience and in accordance with <<TOILS>>, "types 1 through 4: Fixed-length felicity", fixed-length messages are simple to parse and can be regarded as one production in the message _grammar_. <<TOILS>> further states, that "from a reliability-engineering point of view, this [fixed-length messages] is a best case scenario".
+
+====
+This shall be achived by designing any new messages, so that they have fixed bit-length and fixed field-offsets, unless there are important and documented reasons why this cannot be achieved.
+====
+
+==== Fixed bit-offset for fields
+<<TOILS>>, "Ways forward for AIS", recommends to avoid fields with variable offsets.
+
+====
+This shall be achieved by designing new ASMs to have fixed bit-length for each data field to ensure that each data fields starts at a fixed bit-offset.
+====
+
+==== Variable fields last
+According to <<TOILS>>, "Drawing lessons from the defects", it is a minor defect not to have variable-length fields be the last in the message (such as the variable-length binary payload in message type 26 followed by a radio-status field). Variable-length fieds should first and foremost be avoided. And if, for compelling reasons, they cannot - they should be transmitted last in the message to preserve fixed-offset for as many data fields as possible.
+
+====
+This shall be achieved by designing new ASMs so that any variable-length data fields are at the end of the message.
+====
+
+==== One dispatch field
+<<TOILS>> states in several places that the no. of protocol extension mechanisms should be minimal and preferably limited to 1. Any _dispatch fields_ used to control message variants (such as the message type field), should precede any of the data fields it controls.
+
+====
+This shall be achieved by designing new ASMs so that no new extension mechanisms are introdued, to use a minimal no. of dispatch fields, and take dispatch fields into use in the following order: Message ID, Application Identifier, Message-specific dispatch.
+====
+
+==== Minimum no. of datatypes
+<<TOILS>> states that good practice is "for there to be just one type per natural kind; e.g. in a geolocation protocol all longitudes should be encoded with the same length, signedness, and special values. Ditto all latitudes, bearings, timestamp fields, etc.". This also holds for the encoding of numeric valuesfootnote:[Such as e.g. the "Rate of Turn field in the Common Navigation Block required taking a (sign-preserving) square root and then scaling" - which is different from all other numeric fields.] and the indication of non-existent values in order to avoid complicating exception and variants.
+
+====
+This shall be achieved by designing new ASMs so that they do not introduce any unnecessart new data type or encodings, and so that they (re-)use the most common and widely used type encoding used elsewhere in <<AISSPEC5>>.
+====
+
+==== Consistent indication of non-existent values
+<<TOILS>> lists another lesson learned - namely, to avoid data values with unknown semantics
+
+==== Single point of truth
+<<TOILS>> recommends, based on lessons learned from message types 6 and 8, that messages should obey the "single point of truth" principle. This means that there should be no information redundancy inherint in the message, and that one piece of information can only be deduced from a single source in the message.
+
+====
+This shall be achieved by designing new ASMs so that no piece of information is redundant with other information in the same message.
+====
+
+==== Support stream-based parsers
+<<TOILS>> recommends, based on lessons learned from message type 22, that in order to preserve memory and reduce decoder complexity, stream-based decoders must be supported by the message layouts. I.e. decoders which can decode incoming messages without looking ahead in the bit stream.
+
+====
+This shall be achieved by designing new ASMs so that any dispatch-field, changing the interpretation of the message, is transmitted _before_ the data fields whose interpretation it influences.
+====
+
+==== Don't split data fields across datagrams
+As pointed out by <<TOILS>> some AIS messages, such as type 24, need to be reconstructed from two individually transmitted datagrams. This increases decoder complexity by requiring it to hold state between datagrams - and it adds a new dimension to the set of edge cases and problem scenarios, that must be foreseen. Therefore messages split across multiple datagrams must be avoided and all datagrams must be independent.
+
+====
+This shall be achieved be designing any new ASMs to that their entire state is communicated in a single datagram.
+====
+
+==== Check design using ASN.1
+<<TOILS>>, "Drawing lessons from the implementations", recommends "that application-protocol designers should, as a routine part of their process, render the design as a specification in [ASN.1] or [BDEC]."
+
+====
+This shall be achieved by supplying ASN.1 notation for each new ASM proposed.
+====
+
+==== Provide a reference implementation
+<<TOILS>>, "Drawing lessons from the implementations", recommends to "do a reference implementation before you publish an application protocol as a standard" and "as a best practice, the reference implementation should be open source".
+
+====
+This shall be achieved by developing an open source reference implementation of a decoder for each proposed ASM. This reference implementation must be able to decode all variants of the ASM and should be developed before the protocol is published as a standard.
+====
+
+==== Provide test data sets for all message variants
+<<TOILS>>, "Drawing lessons from the implementations", recommends that "an example binary datagram in each of every possible variation of message shape together with a textual, human-readable decode of that datagram" is supplied to enable test and validation of decoders.
+
+====
+This shall be achieved by supplying example datagrams together with a human-readable decode of that datagram for each message variant.
+====
 
 == Problem definition
 
 === Flow management
 
-=== Use case 1:
+=== Use case 1: Flow management involving a shore station
+
 [ditaa]
 ----
                    +-------------+
@@ -64,34 +230,101 @@ Since the 1990's, when AIS was first incepted, a large amount of work in the fie
      |          Lots of work             |
      +-----------------------------------+
 ----
-=== Use case 2:
+
+=== Use case 2: Flow management between ships
+
 
 == Design of flow management support
 
 === High-level design
 In the high-level design of support for flow management no assumptions are made about the characteristics of the underlying transport layer. Focus here, is to identify which pieces of information need to be exchanged, between whom, and when. Following this are detailed specifications for mapping this outcome to real-world protocols, such as AIS <<AISSPEC5>>.
 
+
+
 === Detailed message design
 ==== ASN.1
 ==== MSDL
 ==== AIS
 
-=== Detailed conversation design
+=== Conversation design
 
 [[design_validation]]
 === Validation against design criteria
 
+==== General design criteria
+[cols="1,5,5"]
+|===
+| No. | Criteria | Validation
+
+| 1 | Design with the end-user in mind | -
+| 2| Design for multivendor environment | -
+| 3| Information transfer involving ships must be bandwidth efficient | -
+| 4| Ship-shore interactions must be robust | -
+| 5| Ship-shore data IP connections must be initiated from ship | -
+|===
+
+==== AIS-specific design criteria
+[cols="1,5,5"]
+|===
+| No. | Criteria | Validation
+
+| 1 | Consider updated definitions of ASM and related guidance, before developing new ASM | -
+| 2| Contribute to the IALA AIS ASM collection | -
+| 3| Low transmission frequency | -
+| 4| Use 6-bit ASCII | -
+| 5| Fixed length messages | -
+| 6| Fixed bit-offset for fields | -
+| 7| Variable fields last | -
+| 8| One dispatch field | -
+| 9| Minimum no. of datatypes | -
+| 10| Consistent indication of non-existent values | -
+| 11| Single point of truth | -
+| 12| Support stream-based parsers | -
+| 13| Don't split data fields across datagrams | -
+| 14| Check design using ASN.1 | -
+| 15| Provide a reference implementation | -
+| 16| Provide test data sets for all message variants | -
+
+|===
+
 :numbered!:
+
+== Reader's guide
+
+The following typographic conventions are used throughout this paper.
+
+=== Icons
+|===
+|icon:cogs[] | A ...
+|===
 
 [glossary]
 == Glossary
-MSDL
-AIS
-STM
-VTS
-STCC
-IALA
-ITU
+
+=== Definitions
+
+|===
+|Term |Definition
+
+|Route | ...
+|===
+
+=== Abbreviations
+
+[cols="1,3,3"]
+|===
+|Abbreviation |Expansion | Description
+
+|MSDL |Maritime Service Definition Language | A computer language used to defined services in a maritime
+|AIS |Automatic Identification System |A tracking system used on ships and by vessel traffic services for identifying and locating vessels by electronically exchanging data with other nearby ships, base stations, and satellites.
+|ASM |Application Specific Message |Used only in the context of the automatic identification system, as a method of allowing "competent authorities" to define additional AIS message subtypes, based on message types 6, 8, 25, and 26 which support a custom payload.
+|STM |Sea Traffic Management |The aggregation of the seaborne and shore-based functions (sea traffic services, maritime space management and sea traffic flow management) required to ensure the safe and efficient movement of vessels during all phases of operation.
+|STCC |Sea Traffic Coordination Center |A central, shore-based, hub maintaining record of all vessels at sea using AIS and/or radar to enable managed distribution of vessel routes between ship-to-ship and ship-to-shore.
+|VTS |Vessel traffic service |A vessel traffic service is a marine traffic monitoring system established by public or port authorities, somewhat similar to air traffic control for aircraft.
+|IALA |International Association of Lighthouse Authorities |The International Association of Marine Aids to Navigation and Lighthouse Authorities is a non-profit organization founded collect and provide nautical expertise and advice.
+|ITU |International Telecommunication Union |The International Telecommunication Unio is an agency of the United Nations that is responsible for issues that concern information and communication technologies, such as coordinating the shared global use of the radio spectrum, promoting international cooperation in assigning satellite orbits, assisting in the development of worldwide technical standards.
+|ASCII |American Standard Code for Interformation Interchange | A character encoding scheme used in computers, communications equipment, and other devices that use text, to represent text with numbers.
+|===
 
 [bibliography]
 == Bibliography
@@ -100,11 +333,13 @@ ITU
 
 [[[AISSPEC5]]] "Recommendation ITU-R M.1371-5: Technical characteristics for an automatic identification system using time division multiple access in the VHF maritime mobile frequency band". February, 2014. International Telecommunications Union. Available from http://www.itu.int/rec/R-REC-M.1371-5-201402-I.
 
-[[[AISADMG]]] "Guidance on the use of AIS application-specific messages". Published as SN.1/Circ.289 by the International Maritime Organization (IMO). June 2, 2010.
+[[[AISG289]]] "Guidance on the use of AIS application-specific messages". Published as SN.1/Circ.289 by the International Maritime Organization (IMO). June 2, 2010.
 
 [[[IALA144]]] "IALA Recommendation e-NAV - 144 On Harmonized implementation of Application Specific Messages (ASM)". Edition 1. June, 2011. International Association of Marine Aids to Navigation and Lighthouse Authorities.
 
-=== Articles, blogs and papers
+[[[AISASM]]] "Application Specific Messages". IALA maintained collection of regional applications for AIS Application Specific Messages in use. http://www.e-navigation.nl/asm.
+
+=== Articles and papers
 
 [[[TOILS]]] "The Toils of AIS: A Case Study in Application Protocol Design And Analysis" by Eric S. Raymond and Kurt Schwehr. 2013. Available from http://gitorious.org/toils-of-ais/toils-of-ais/
 
