@@ -160,9 +160,6 @@ This shall be achieved by designing new ASMs so that no new extension mechanisms
 This shall be achieved by designing new ASMs so that they do not introduce any unnecessart new data type or encodings, and so that they (re-)use the most common and widely used type encoding used elsewhere in <<AISSPEC5>>.
 ====
 
-==== Consistent indication of non-existent values
-<<TOILS>> lists another lesson learned - namely, to avoid data values with unknown semantics
-
 ==== Single point of truth
 <<TOILS>> recommends, based on lessons learned from message types 6 and 8, that messages should obey the "single point of truth" principle. This means that there should be no information redundancy inherint in the message, and that one piece of information can only be deduced from a single source in the message.
 
@@ -208,8 +205,40 @@ This shall be achieved by supplying example datagrams together with a human-read
 == Problem definition
 
 === Flow management
+As defined by <<ARCH>> flow management is communication which takes place between ships in a peer-to-peer situation, or between ships and a coordinating organisation (e.g. VTS, STCC) in order to:
 
-=== Use case 1: Flow management involving a shore station
+1. Increase safety and prevent delays through a good flow in narrow channels with high traffic density
+1. Support vessel in arriving at final destination in due time as efficient as possible
+1. Provide information to interested parties about planned and predicted time of arrival to final destination or other point of interest.
+
+The scope of this work is item 1 - to enable a "good" flow in channels with high traffic density. "Good" in this context means that collisions and dangerous situations are avoided and that vessels can safely follow their announced intended movement through the area.
+
+In order to support "good flow management" all _intended movements_ need to be managed. This process is called _flow management_. Flow management can take place between vessels on a peer-to-peer basis -- _autonomous flow management_ -- or between coordinating organizations and individual vessels -- _dependent flow management_.
+
+In a fully managed scenario all vessels can safely and efficiently follow their intended movements through their entire passage of the area.
+
+In order to facilitate flow management vessels in the area must transmit their intended movements. This allows other vessels in the area to adjust their own intended movements accordingly or for them -- or a shore-based coordination centre -- to suggest adjustments to the announced intended movements of other vessels.
+
+A suggested change to an intended movement can be in two forms:
+
+1. Geometry (adding, deleting or changing waypoints)
+1. Waypoint ETA (not changing any waypoints)
+
+Changing the geometry of an intended movement is a relatively complex operation for the vessel's navigator. Among other things the process involves a safety check of the new route and reprogramming of navigational equipment. The cost/workload of this operation reduces the likelihood of a vessel complying with suggested changes.
+
+Changing the waypoint ETA's is a far simpler operation for the navigator. This involves only adjustment of the vessel's speed and recalculation of the wheel-over-point in advance of each waypoint. It is therefore expected, that the likelihood of a of vessel complying with a suggested change of this type is higher than suggested changes to geometry.
+
+=== Scope of work
+The scope of the work in this paper is flow management based on fixed geometry and dynamic suggestions to waypoint ETA.
+
+The objective is to define _which_ information (i.e. _data fields_) that need to be exchanged and to define the criteria for _when_ this information is transmitted.
+
+=== Use cases
+
+==== Use case 1: Dependent flow management
+
+===== Initial state
+The initial state is depicted here:
 
 [ditaa]
 ----
@@ -231,7 +260,8 @@ This shall be achieved by supplying example datagrams together with a human-read
      +-----------------------------------+
 ----
 
-=== Use case 2: Flow management between ships
+==== Use case 2: Autonomous flow management
+
 
 
 == Design of flow management support
@@ -277,13 +307,12 @@ In the high-level design of support for flow management no assumptions are made 
 | 7| Variable fields last | -
 | 8| One dispatch field | -
 | 9| Minimum no. of datatypes | -
-| 10| Consistent indication of non-existent values | -
-| 11| Single point of truth | -
-| 12| Support stream-based parsers | -
-| 13| Don't split data fields across datagrams | -
-| 14| Check design using ASN.1 | -
-| 15| Provide a reference implementation | -
-| 16| Provide test data sets for all message variants | -
+| 10| Single point of truth | -
+| 11| Support stream-based parsers | -
+| 12| Don't split data fields across datagrams | -
+| 13| Check design using ASN.1 | -
+| 14| Provide a reference implementation | -
+| 15| Provide test data sets for all message variants | -
 
 |===
 
@@ -303,10 +332,14 @@ The following typographic conventions are used throughout this paper.
 
 === Definitions
 
+[cols="1,6"]
 |===
 |Term |Definition
 
-|Route | ...
+|Route |A general term of little practical use covering a vessel's intended navigation for an undefined period of time.
+|Strategic route |A sequence of waypoints possibly spanning a large geographical area and more than 24h of sailing time. There is no estimated times of arrival associated with the waypoints. The strategic route can be considered as a route template, that vessel's use to describe their navigational intentions at a high level of abstraction. The strategic route is often used in communication between vessel and shore-based organizations such as a shipping company.
+|Tactical route |A sequence of waypoints describing a vessel's intended navigation for a limited amount of time, usually less than 24 hours; typically about 6 hours. There are estimated times of arrival associated with each waypoint. A tactical route is mainly used onboard a vessel, and is developed by the navigator as a means to navigate the vessel.
+|Intended movement |An _intended movement_ is sequence of waypoints with associated times of arrival. The intended movement spans a short range of geography (~10 nm) and time (< 6 hours) and is used to communicate a vessel's short term intended navigational movements to other vessels and shore-based traffic coordinating organisations in order to support flow management and to avoid collisions and dangerous situations between vessels.
 |===
 
 === Abbreviations
