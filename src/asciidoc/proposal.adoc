@@ -1,6 +1,6 @@
 = Message exchange for flow management in maritime traffic management systems.
 Thomas Borg Salling <tbsalling@tbsalling.dk>
-v0.1, December 10, 2014: Document created
+v0.0, January 6, 2015: First draft
 :keywords: imo, iala, ais, itu-r-1371, monalisa, ten-t
 :toc-placement: preamble
 :icons: font
@@ -11,9 +11,9 @@ image::images/dma.png[align="center", scaledwidth="25%"]
 image::images/monalisa2.png[align="center"]
 image::images/eu.png[align="center"]
 
-[cols="1,3,3"]
+[cols="1,2,4,4"]
 |===
-| v0.1 |Thomas Borg Salling <tbsalling@tbsalling.dk> |First draft.
+|v0.0 |06 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |First draft.
 |===
 
 [abstract]
@@ -23,7 +23,7 @@ image::images/eu.png[align="center"]
 :numbered:
 
 == Introduction
-As part of - and as a contribution to - the MONA LISA 2.0 <<MONALISA2>> project, the Danish Maritime Authority has worked to define message conversation scenarios and detailed message formats for _flow management_ in the context of _sea traffic management (STM)_ as defined by <<ARCH>>.
+As part of -- and as a contribution to -- the MONA LISA 2.0 <<MONALISA2>> project, the Danish Maritime Authority has worked to define message conversation scenarios and detailed message formats for _flow management_ in the context of _sea traffic management (STM)_ as defined by <<ARCH>>.
 
 The resulting proposal contains inputs, contributions, and insights from DMA and project partners.
 
@@ -46,7 +46,110 @@ _Dept. of Technology and Business Development_
 M.Sc. Jens Kristian Jensen <JKJ@dma.dk>
 ****
 
-== Design criteria
+== Problem definition
+
+=== Flow management
+As defined by <<ARCH>> flow management is communication which takes place between ships in a peer-to-peer situation, or between ships and a coordinating organisation (e.g. VTS, STCC) in order to:
+
+1. Increase safety and prevent delays through a good flow in narrow channels with high traffic density
+1. Support vessel in arriving at final destination in due time as efficient as possible
+1. Provide information to interested parties about planned and predicted time of arrival to final destination or other point of interest.
+
+The scope of this work is item 1 - to enable a "good" flow in channels with high traffic density. "Good" in this context means that collisions and dangerous situations are avoided and that vessels can safely follow their announced intended movement through the area.
+
+==== The process
+Flow management is based on knowledge of vessels' _intended movements_; i.e. announcements from each vessel regarding their intended manouvers in the short-term future. When this knowledge is known either centrally at a coordinating center (CC) or distributed between nearby vessels, it is possible for the CC or the nearby vessels to suggest and negotiate intended movements to obtain a "good" flow. This process is called _flow management_.
+
+If flow management takes place between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- all vessels can safely and efficiently follow their intended movements through their entire passage of the area.
+
+==== Controlled flow management
+
+Controlled flow management always takes place inside a defined geographical area called the _controlled area_.
+[[img-controlled-area]]
+.A controlled area.
+image::images/controlled_area.png[Sunset, 300, 300]
+
+===== Vessel states
+Vessels outside the controlled area can be in state
+
+- _entering_ -- meaning that the vessel intends to enter the controlled area.
+
+Vessels inside the controlled area can be in states
+
+- _leaving_ -- meaning that the vessel intends to leave the controlled area.
+- _staying_ -- meaning that the vessel intends to seek berth, drop anchor, or elsehow keep manouvering inside the area.
+
+==== Autonomous flow management
+
+==== Announcement of intended movements
+In order to facilitate flow management vessels in the area must transmit their intended movements and basic information concerning their manouvering capabilities.
+
+==== Suggested movements
+A suggested change to an intended can be transmitted from a CC or a peer vessel. It can be in one of two principal forms:
+
+1. Geometry (adding, deleting or changing waypoints)
+1. Waypoint ETA (not changing any waypoints)
+
+Changing the geometry of an intended movement is a relatively complex operation for the vessel's navigator. Among other things the process involves a safety check of the new route and reprogramming of navigational equipment. The cost/workload of this operation reduces the likelihood of a vessel complying with suggested changes.
+
+Changing the waypoint ETA's is a far simpler operation for the navigator. This involves only adjustment of the vessel's speed and recalculation of the wheel-over-point in advance of each waypoint. It is therefore expected, that the likelihood of a of vessel complying with a suggested change of this type is higher than suggested changes to geometry.
+
+=== Scope of work
+The scope of the work in this paper is flow management based on fixed geometry and dynamic suggestions to waypoint ETA.
+
+The objective is to define _which_ information (i.e. _data fields_) that need to be exchanged and to define the criteria for _when_ this information is transmitted.
+
+The outcome is a set of message definitions, transmission criteria and a reference implementation to support controlled and autonomous flow management.
+
+=== Use cases
+
+==== Use case 1: Controlled flow management
+
+===== Initial state
+There exists an area bounded by a closed polygon. Flow management is exercised inside this area. In the case of controlled flow management the area is called a _controlled area_.
+
+Some of the vessels are aware of some of the other vessels' intended movements.
+
+The coordination centre is aware of some of the vessel's intended movements.
+
+The coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages.
+
+_The following abbreviations are used: The controlled area (A), the coordination centre (CC), a vessel (V~0~) entering A, other vessels inside A (V~n~), a message (M~n~)._
+
+===== Use case 1.1: Vessel entering the area
+
+====== Normal use case: CC suggests intended movements for all vessels in A.
+[cols="1,5,5"]
+|===
+| No. | Event | Action
+
+| 1 | CC detects, that V~0~ has crossed the polygon and is now inside A. | CC transmits an addressed message, M~1~, to V~0~, requesting it broadcast its intended movements inside A.footnote:[This is done even if CC already has this information in order to distribute this information to other vessels in A]
+| 2| V~0~ receives M~1~. | V~0~ responds by broadcasting message M~2~, which contains the intended movements of V~0~ inside A, including waypoints and estimated time of arrival at each waypoint.
+.2+| 3 | M~2~ is received by CC (and likely some of the other vessels in the area). | CC recalculates optimal speeds per vessel.footnote:[with priority to suggest speed changes for V~0~ over other vessels, and fewest possible other vessels, and only for vessels intending to leave A.]
+   | *Exception:* M~2~ is never received by CC. | CC retransmits M~1~ to V~0~.
+| 4| CC recalculation complete. | CC transmits addressed messages, M~n~, with suggested intended movements to those vessels which (according to the CC calculation) require changes.
+.2+| 5| V~n~ receives M~n~. | Navigator is alerted.
+| *Exception:* V~n~ is never received by M~n~. | _May lead to special case: CC discovers new suggestions needed._
+| 6| Navigator of V~n~ approves suggested intended movement. | V~n~ broadcasts message containing intended movement.
+|===
+
+It is noted from the use case, that the following messages are involved:
+
+- Step 1: Intended movement inquiry. Addressed.
+- Step 2: Intended movement. Broadcast.
+- Step 4: Suggested movement. Addressed.
+
+====== Special use case: CC discovers new suggestions needed
+
+====== Special use case: V~2~ suggests intended movement for V~0~ in controlled flow management
+
+..
+
+M~2~ is received by CC and some of the other vessels in the area. CC may retransmit M~1~ if it has not received M~2~.
+
+==== Use case 2: Autonomous flow management
+
+== Message design criteria
 Since the 1990's, when AIS was first incepted, a large amount of work in the field maritime messaging has been performed. In order take advantage of lessons learned and other previous experiences, a number of design criteria for the current work are defined below.
 
 The proposed design and reference implementation on flow management support complies with each of these criteria. This will be validated in <<design_validation>>.
@@ -202,74 +305,10 @@ This shall be achieved by developing an open source reference implementation of 
 This shall be achieved by supplying example datagrams together with a human-readable decode of that datagram for each message variant.
 ====
 
-== Problem definition
-
-=== Flow management
-As defined by <<ARCH>> flow management is communication which takes place between ships in a peer-to-peer situation, or between ships and a coordinating organisation (e.g. VTS, STCC) in order to:
-
-1. Increase safety and prevent delays through a good flow in narrow channels with high traffic density
-1. Support vessel in arriving at final destination in due time as efficient as possible
-1. Provide information to interested parties about planned and predicted time of arrival to final destination or other point of interest.
-
-The scope of this work is item 1 - to enable a "good" flow in channels with high traffic density. "Good" in this context means that collisions and dangerous situations are avoided and that vessels can safely follow their announced intended movement through the area.
-
-In order to support "good flow management" all _intended movements_ need to be managed. This process is called _flow management_. Flow management can take place between vessels on a peer-to-peer basis -- _autonomous flow management_ -- or between coordinating organizations and individual vessels -- _dependent flow management_.
-
-In a fully managed scenario all vessels can safely and efficiently follow their intended movements through their entire passage of the area.
-
-In order to facilitate flow management vessels in the area must transmit their intended movements. This allows other vessels in the area to adjust their own intended movements accordingly or for them -- or a shore-based coordination centre -- to suggest adjustments to the announced intended movements of other vessels.
-
-A suggested change to an intended movement can be in two forms:
-
-1. Geometry (adding, deleting or changing waypoints)
-1. Waypoint ETA (not changing any waypoints)
-
-Changing the geometry of an intended movement is a relatively complex operation for the vessel's navigator. Among other things the process involves a safety check of the new route and reprogramming of navigational equipment. The cost/workload of this operation reduces the likelihood of a vessel complying with suggested changes.
-
-Changing the waypoint ETA's is a far simpler operation for the navigator. This involves only adjustment of the vessel's speed and recalculation of the wheel-over-point in advance of each waypoint. It is therefore expected, that the likelihood of a of vessel complying with a suggested change of this type is higher than suggested changes to geometry.
-
-=== Scope of work
-The scope of the work in this paper is flow management based on fixed geometry and dynamic suggestions to waypoint ETA.
-
-The objective is to define _which_ information (i.e. _data fields_) that need to be exchanged and to define the criteria for _when_ this information is transmitted.
-
-=== Use cases
-
-==== Use case 1: Dependent flow management
-
-===== Initial state
-The initial state is depicted here:
-
-[ditaa]
-----
-                   +-------------+
-                   | Asciidoctor |-------+
-                   |  Diagram    |       |
-                   +-------------+       | PNG out
-                       ^                 |
-                       | ditaa in        |
-                       |                 v
- +--------+   +--------+----+    /----------------\
- |        | --+ Asciidoctor +--> |                |
- |  Text  |   +-------------+    |Beautiful output|
- |Document|   |   !magic!   |    |                |
- |     {d}|   |             |    |                |
- +---+----+   +-------------+    \----------------/
-     :                                   ^
-     |          Lots of work             |
-     +-----------------------------------+
-----
-
-==== Use case 2: Autonomous flow management
-
-
-
-== Design of flow management support
+== Design of flow management messages
 
 === High-level design
 In the high-level design of support for flow management no assumptions are made about the characteristics of the underlying transport layer. Focus here, is to identify which pieces of information need to be exchanged, between whom, and when. Following this are detailed specifications for mapping this outcome to real-world protocols, such as AIS <<AISSPEC5>>.
-
-
 
 === Detailed message design
 ==== ASN.1
@@ -351,6 +390,7 @@ The following typographic conventions are used throughout this paper.
 |MSDL |Maritime Service Definition Language | A computer language used to defined services in a maritime
 |AIS |Automatic Identification System |A tracking system used on ships and by vessel traffic services for identifying and locating vessels by electronically exchanging data with other nearby ships, base stations, and satellites.
 |ASM |Application Specific Message |Used only in the context of the automatic identification system, as a method of allowing "competent authorities" to define additional AIS message subtypes, based on message types 6, 8, 25, and 26 which support a custom payload.
+|CC | Coordination Center |A term specific to this document invented to cover all types of VTS, STCC, and other centres with responsibility for traffic management and coordination.
 |STM |Sea Traffic Management |The aggregation of the seaborne and shore-based functions (sea traffic services, maritime space management and sea traffic flow management) required to ensure the safe and efficient movement of vessels during all phases of operation.
 |STCC |Sea Traffic Coordination Center |A central, shore-based, hub maintaining record of all vessels at sea using AIS and/or radar to enable managed distribution of vessel routes between ship-to-ship and ship-to-shore.
 |VTS |Vessel traffic service |A vessel traffic service is a marine traffic monitoring system established by public or port authorities, somewhat similar to air traffic control for aircraft.
