@@ -114,45 +114,51 @@ The coordination centre is aware of some of the vessel's intended movements.
 
 The coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages.
 
-_The following abbreviations are used: The controlled area (A), the coordination centre (CC), a vessel (V~0~) entering A, other vessels inside A (V~n~), a message (M~n~)._
+===== Use case 1.1: Vessel enters the controlled area
 
-===== Use case 1.1: Vessel entering the area
-
-====== Normal use case: CC suggests intended movements for all vessels in A.
+{set:step:0}
 [cols="1,5,5"]
 |===
 | No. | Event | Action
 
-| 1 | CC detects, that V~0~ has crossed the polygon and is now inside A. | CC transmits an addressed message, M~1~, to V~0~, requesting it broadcast its intended movements inside A.footnote:[This is done even if CC already has this information in order to distribute this information to other vessels in A]
-| 2| V~0~ receives M~1~. | V~0~ responds by broadcasting message M~2~, which contains the intended movements of V~0~ inside A, including waypoints and estimated time of arrival at each waypoint.
-.2+| 3 | M~2~ is received by CC (and likely some of the other vessels in the area). | CC recalculates optimal speeds per vessel.footnote:[with priority to suggest speed changes for V~0~ over other vessels, and fewest possible other vessels, and only for vessels intending to leave A.]
-   | *Exception:* M~2~ is never received by CC. | CC retransmits M~1~ to V~0~.
-| 4| CC recalculation complete. | CC transmits addressed messages, M~n~, with suggested intended movements to those vessels which (according to the CC calculation) require changes.
-.2+| 5| V~n~ receives M~n~. | Navigator is alerted.
-| *Exception:* V~n~ is never received by M~n~. | _May lead to special case: CC discovers new suggestions needed._
-| 6| Navigator of V~n~ approves suggested intended movement. | V~n~ broadcasts message containing intended movement.
+| {counter:step} | The coordination centre detects, that a vessel has entered the controlled area. | The control centre transmits an addressed message to the vessel requesting it broadcast intended movements.footnote:[This is done even if the coordination centre already has this information in order to distribute this information to other vessels in the area.]
+| {counter:step} | The vessel receives the message. | The vessel responds by broadcasting message, which contains its intended movements.
+.2+| {counter:step} | The broadcast is received by the coordination centre (and likely some of the other vessels in the area). | The control centre recalculates optimal speeds per vessel.footnote:[with priority to suggest speed changes for V~0~ over other vessels, and fewest possible other vessels, and only for vessels intending to leave A.]
+   | *Exception:* The broadcast is never received by the coordination centre. | The coordination centre retransmits its message to the vessel.
+| {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with suggested movements to those vessels which (according to the calculation) require changes.
+.2+| {counter:step} | A vessel receives its suggested movement from the coordination centre. | The navigator is alerted.
+| *Exception:* The suggsted movement is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
+| {counter:step} | Navigator of approves suggested movement. | The vessel broadcasts a message containing its new intended movement.
 |===
 
-It is noted from the use case, that the following messages are involved:
+===== Use case 1.2: Coordination centre determintes new suggested movements needed
 
-- Step 1: Intended movement inquiry. Addressed.
-- Step 2: Intended movement. Broadcast.
-- Step 4: Suggested movement. Addressed.
+{set:step:0}
+[cols="1,5,5"]
+|===
+| No. | Event | Action
 
-====== Special use case: CC discovers new suggestions needed
+| {counter:step} | The coordination centre detects that the current flow is not optimal ("good") | The control centre recalculates optimal speeds per vessel.
+| {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with suggested movements to those vessels which (according to the calculation) require changes.
+.2+| {counter:step} | A vessel receives its suggested movement from the coordination centre. | The navigator is alerted.
+| *Exception:* The suggsted movement is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
+| {counter:step} | Navigator of approves suggested movement. | The vessel broadcasts a message containing its new intended movement.
+|===
 
-====== Special use case: V~2~ suggests intended movement for V~0~ in controlled flow management
+===== Use case 1.3: A vessel suggests intended movement for another vessel in a controlled flow management scenario
 
-..
-
-M~2~ is received by CC and some of the other vessels in the area. CC may retransmit M~1~ if it has not received M~2~.
+...
 
 ==== Use case 2: Autonomous flow management
 
-== Message design criteria
-Since the 1990's, when AIS was first incepted, a large amount of work in the field maritime messaging has been performed. In order take advantage of lessons learned and other previous experiences, a number of design criteria for the current work are defined below.
+...
 
-The proposed design and reference implementation on flow management support complies with each of these criteria. This will be validated in <<design_validation>>.
+== Message design criteria
+Messaging in the maritime domain has been available many years and communication standards have evolved and been added and augmented several times to accomodate the increasing demand for handling more and more complex scenarios in the maritime domain.
+
+When suggesting message exchange for advanced use cases, such as for flow management, we want to take lessons learned from the past years into account. Literature, has as <<TOILS>>, has therefore been studied to establish a set of design criteria for the messages that are defined for flow management.
+
+In section <<design_validation>> it will be validated, that the suggested messages layouts and payloads are in compliance with these design criteria.
 
 === General design criteria
 
@@ -316,6 +322,14 @@ In the high-level design of support for flow management no assumptions are made 
 ==== AIS
 
 === Conversation design
+_The following abbreviations are used: The controlled area (A), the coordination centre (CC), a vessel (V~0~) entering A, other vessels inside A (V~n~), a message (M~n~)._
+
+It is noted from the use case, that the following messages are involved:
+
+- Step 1: Intended movement inquiry. Addressed.
+- Step 2: Intended movement. Broadcast.
+- Step 4: Suggested movement. Addressed.
+
 
 [[design_validation]]
 === Validation against design criteria
