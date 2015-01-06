@@ -400,6 +400,14 @@ The payloads of these message types are the following:
 
 |===
 
+== Test data
+
+=== AIS
+
+== Reference implementation
+
+=== AIS
+
 :numbered!:
 
 == Reader's guide
