@@ -21,6 +21,7 @@ asciidoctor {
         attributes: [
             'source-highlighter': 'coderay',
             toc                 : '',
+	    toclevels		: '3',
             idprefix            : '',
             idseparator         : '-'
         ]
