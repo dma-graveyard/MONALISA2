@@ -102,7 +102,7 @@ image::images/controlled_area.png[img-controlled-area, align="center"]
 ...
 
 === Scope of work
-The scope of the work in this paper is flow management - both controlled and autonomous; but limited to flow management suggestion s in the speed-based form.
+The scope of the work in this paper is _controlled flow management in a limited area (in order of size as a VTS area) based on flow management suggestions in the speed-based form_.
 
 The objective is to define _which_ information (i.e. payload, data fields) that need to be exchanged and to define the criteria/triggers for _when_ this information is transmitted.
 
@@ -321,9 +321,9 @@ In the high-level design of support for flow management no assumptions are made 
 ==== Message types
 Based on the <<use_cases>> it is noted, that the following messages are involved in flow management:
 
-- *tactical voyageplan inquiry*. An addressed message transmitted by coordination centers and vessels to inquire a vessel about its tactical voyageplans.
+- *tactical voyageplan inquiry*. An addressed message transmitted by coordination centers and vessels to inquire a vessel about its tactical voyageplan.
 - *tactical voyageplan*. For a vessel to broadcast its tactical voyageplans.
-- *flow management suggestion *. An addressed message transmitted by coordination centers and vessels to suggest changes to a vessel's announced tactical voyageplan.
+- *flow management suggestion*. An addressed message transmitted by coordination centers and vessels to suggest changes to a vessel's announced tactical voyageplan.
 
 ==== Message payloads
 
@@ -358,9 +358,13 @@ The payloads of these message types are the following:
 |===
 
 === Detailed message design
+
 ==== ASN.1
+
 ==== MSDL
+
 ==== AIS
+
 
 [[design_validation]]
 == Validation against design criteria
@@ -407,6 +411,9 @@ The payloads of these message types are the following:
 == Reference implementation
 
 === AIS
+
+== Recommended further work
+- autonomous flow management
 
 :numbered!:
 
