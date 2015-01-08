@@ -57,22 +57,22 @@ As defined by <<ARCH>> flow management is communication which takes place betwee
 1. Support vessel in arriving at final destination in due time as efficient as possible
 1. Provide information to interested parties about planned and predicted time of arrival to final destination or other point of interest.
 
-For item 1 the term "good" means that collisions and dangerous situations are avoided and that vessels can safely follow their announced intended movements through the area.
+For item 1 the term "good" means that collisions and dangerous situations are avoided and that vessels can safely follow their announced tactical voyageplan through the area.
 
-Flow _management_ is based on knowledge of vessels' intended movements; i.e. announcements from each vessel regarding their intended manouvers in the short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for the coordination centre or the nearby vessels to suggest and negotiate intended movements to obtain a "good" flow. It is this process which is called _flow management_.
+Flow _management_ is based on knowledge of vessels' tactical voyageplans; i.e. announcements from each vessel regarding their intended manouvers in the immediate short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for the coordination centre or the nearby vessels to suggest and negotiate tactical voyageplans to obtain a "good" flow. It is this process which is called _flow management_.
 
-If flow management takes place in a self-organizaing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- all vessels can safely and efficiently follow their intended movements through their entire passage of the area.
+If flow management takes place in a self-organizaing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- all vessels can safely and efficiently follow their tactical voyageplans through their entire passage of the area.
 
-===== Intended movements
-In order to facilitate flow management vessels in the area must transmit their intended movements (waypoints and ETA's) and basic information concerning their manouvering capabilities.
+===== Tactical voyageplan
+In order to facilitate flow management vessels in the area must transmit their tactical voyageplan and optionally basic information concerning their manouvering capabilities.
 
-===== Suggested movements
-A suggested change to an intended movement is called a _suggested movement_. A suggested movement can be transmitted from either a coordination centre or a peer vessel. It can take one of two principal forms:
+===== Suggested tactical voyageplan
+A suggested change to an tactical voyageplan is called a _flow management suggestion_. A flow management suggestion can be transmitted from either a coordination centre or a peer vessel. It can take one of two principal forms:
 
 1. Geometry-based (adding, deleting or changing waypoints)
 1. Speed-based (not changing any waypoints)
 
-Changing the geometry of an intended movement is a relatively complex operation for the vessel's navigator. Among other things the process involves a safety check of the new route and reprogramming of navigational equipment. The cost/workload of this operation reduces the likelihood of a vessel complying with suggested changes.
+Changing the geometry of an tactical voyageplan is a relatively complex operation for the vessel's navigator. Among other things the process involves a safety check of the new route and reprogramming of navigational equipment. The cost/workload of this operation reduces the likelihood of a vessel complying with suggested changes.
 
 Changing the vessel's speed (or waypoint ETA's) is a far simpler operation for the navigator. This involves only adjustment of the vessel's speed and recalculation of the wheel-over-point in advance of each waypoint. It is therefore expected, that the likelihood of a of vessel complying with a suggested change of this type is higher than suggested changes to geometry.
 
@@ -90,7 +90,7 @@ Vessels inside the controlled area can be in states
 - _leaving_ -- meaning that the vessel intends to leave the controlled area.
 - _staying_ -- meaning that the vessel intends to seek berth, drop anchor, or elsehow keep manouvering inside the area.
 
-Some of the vessels are aware of some of the other vessels' intended movements, and the coordination centre is aware of some of the vessel's intended movements.
+Some of the vessels are aware of some of the other vessels' tactical voyageplans, and the coordination centre is aware of some of the vessel's tactical voyageplans.
 
 The coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages, so that it can maintain an updated real-time picture of the current traffic situation.
 
@@ -102,7 +102,7 @@ image::images/controlled_area.png[img-controlled-area, align="center"]
 ...
 
 === Scope of work
-The scope of the work in this paper is flow management - both controlled and autonomous; but limited to suggested movements in the speed-based form.
+The scope of the work in this paper is flow management - both controlled and autonomous; but limited to flow management suggestion s in the speed-based form.
 
 The objective is to define _which_ information (i.e. payload, data fields) that need to be exchanged and to define the criteria/triggers for _when_ this information is transmitted.
 
@@ -121,17 +121,17 @@ The outcome is a set of message definitions, transmission criteria, test data, a
 |===
 | No. | Event | Action
 
-| {counter:step} | The coordination centre detects, that a vessel has entered the controlled area. | The control centre transmits an addressed message to the vessel requesting it broadcast intended movements.footnote:[This is done even if the coordination centre already has this information in order to distribute this information to other vessels in the area.]
-| {counter:step} | The vessel receives the message. | The vessel responds by broadcasting message, which contains its intended movements.
+| {counter:step} | The coordination centre detects, that a vessel has entered the controlled area. | The control centre transmits an addressed message to the vessel requesting it broadcast tactical voyageplans.footnote:[This is done even if the coordination centre already has this information in order to distribute this information to other vessels in the area.]
+| {counter:step} | The vessel receives the message. | The vessel responds by broadcasting message, which contains its tactical voyageplans.
 .2+| {counter:step} | The broadcast is received by the coordination centre (and likely some of the other vessels in the area). | The control centre recalculates optimal speeds per vessel.footnote:[with priority to suggest speed changes for V~0~ over other vessels, and fewest possible other vessels, and only for vessels intending to leave A.]
    | *Exception:* The broadcast is never received by the coordination centre. | The coordination centre retransmits its message to the vessel.
-| {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with suggested movements to those vessels which (according to the calculation) require changes.
-.2+| {counter:step} | A vessel receives its suggested movement from the coordination centre. | The navigator is alerted.
-| *Exception:* The suggsted movement is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
-| {counter:step} | Navigator of approves suggested movement. | The vessel broadcasts a message containing its new intended movement.
+| {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
+.2+| {counter:step} | A vessel receives its flow management suggestion  from the coordination centre. | The navigator is alerted.
+| *Exception:* The flow management suggestion is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
+| {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
 |===
 
-==== Use case: Coordination centre determintes new suggested movements needed
+==== Use case: Coordination centre determintes new flow management suggestion s needed
 
 {set:step:0}
 [cols="1,5,5"]
@@ -140,13 +140,13 @@ The outcome is a set of message definitions, transmission criteria, test data, a
 | No. | Event | Action
 
 | {counter:step} | The coordination centre detects that the current flow is not optimal ("good") | The control centre recalculates optimal speeds per vessel.
-| {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with suggested movements to those vessels which (according to the calculation) require changes.
-.2+| {counter:step} | A vessel receives its suggested movement from the coordination centre. | The navigator is alerted.
-| *Exception:* The suggsted movement is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
-| {counter:step} | Navigator of approves suggested movement. | The vessel broadcasts a message containing its new intended movement.
+| {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
+.2+| {counter:step} | A vessel receives its flow management suggestion  from the coordination centre. | The navigator is alerted.
+| *Exception:* The flow management suggestion is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
+| {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
 |===
 
-==== Use case: A vessel suggests intended movement for another vessel
+==== Use case: A vessel suggests tactical voyageplan for another vessel
 (in a controlled flow management scenario)
 
 ...
@@ -321,16 +321,16 @@ In the high-level design of support for flow management no assumptions are made 
 ==== Message types
 Based on the <<use_cases>> it is noted, that the following messages are involved in flow management:
 
-- *Intended movement inquiry*. An addressed message transmitted by coordination centers and vessels to inquire a vessel about its intended movements.
-- *Intended movement*. For a vessel to broadcast its intended movements.
-- *Suggested movement*. An addressed message transmitted by coordination centers and vessels to suggest a vessel a movement.
+- *tactical voyageplan inquiry*. An addressed message transmitted by coordination centers and vessels to inquire a vessel about its tactical voyageplans.
+- *tactical voyageplan*. For a vessel to broadcast its tactical voyageplans.
+- *flow management suggestion *. An addressed message transmitted by coordination centers and vessels to suggest changes to a vessel's announced tactical voyageplan.
 
 ==== Message payloads
 
 The payloads of these message types are the following:
 
 [cols="2,6"]
-.Payload of message type *intended movement inquiry*.
+.Payload of message type *tactical voyageplan inquiry*.
 |===
 | Data field | Description
 
@@ -340,7 +340,7 @@ The payloads of these message types are the following:
 |===
 
 [cols="2,6"]
-.Payload of message type *intended movement*.
+.Payload of message type *tactical voyageplan*.
 |===
 | Data field | Description
 
@@ -349,7 +349,7 @@ The payloads of these message types are the following:
 |===
 
 [cols="2,6"]
-.Payload of message type *suggested movement*.
+.Payload of message type *flow management suggestion *.
 |===
 | Data field | Description
 
@@ -428,11 +428,9 @@ The following typographic conventions are used throughout this paper.
 |===
 |Term |Definition
 
-|Route |A general term of little practical use covering a vessel's intended navigation for an undefined period of time.
-|Strategic route |A sequence of waypoints possibly spanning a large geographical area and more than 24h of sailing time. There is no estimated times of arrival associated with the waypoints. The strategic route can be considered as a route template, that vessel's use to describe their navigational intentions at a high level of abstraction. The strategic route is often used in communication between vessel and shore-based organizations such as a shipping company.
-|Tactical route |A sequence of waypoints describing a vessel's intended navigation for a limited amount of time in the immediate future. There are estimated times of arrival associated with each waypoint. A tactical route is mainly used onboard a vessel, and is developed by the navigator as a means to navigate the vessel.
-|Intended movement |An _intended movement_ is sequence of waypoints with associated times of arrival. The intended movement spans a short range of geography (~10 nm) and time (< 6 hours) and is used to communicate a vessel's short term intended navigational movements to other vessels and shore-based traffic coordinating organisations in order to support flow management and to avoid collisions and dangerous situations between vessels.
-
+|Strategic voyageplan | MONALISA 2 term for long term planning that consists of a route with a voyage number (and other Route information), a list of waypoints (geometry), a schedule, charter parties, legal conditions, and more. When a Strategic voyage plan is given to the ship as a voyage order it changes to _dynamic voyageplan_.
+|Dynamic voyageplan | MONALISA 2 term for an optimised version of the _strategic voyageplan_
+|Tactical voyageplan | MONALISA 3 term for a dynamic voyageplan in conning mode; i.e. under tactical execution. Whole or parts of the tactical voyage plan can be transmitted to increase situational awareness and support flow management.
 |===
 
 === Abbreviations
@@ -445,7 +443,7 @@ The following typographic conventions are used throughout this paper.
 |AIS |Automatic Identification System |A tracking system used on ships and by vessel traffic services for identifying and locating vessels by electronically exchanging data with other nearby ships, base stations, and satellites.
 |ASM |Application Specific Message |Used only in the context of the automatic identification system, as a method of allowing "competent authorities" to define additional AIS message subtypes, based on message types 6, 8, 25, and 26 which support a custom payload.
 |CC | Coordination Center |A term specific to this document invented to cover all types of VTS, STCC, and other centres with responsibility for traffic management and coordination.
-|STM |Sea Traffic Management |The aggregation of the seaborne and shore-based functions (sea traffic services, maritime space management and sea traffic flow management) required to ensure the safe and efficient movement of vessels during all phases of operation.
+|STM |Sea Traffic Management |The aggregation of the seaborne and shore-based functions (sea traffic services, maritime space management and sea traffic flow management) required to ensure the safe and efficient manouvering of vessels during all phases of operation.
 |STCC |Sea Traffic Coordination Center |A central, shore-based, hub maintaining record of all vessels at sea using AIS and/or radar to enable managed distribution of vessel routes between ship-to-ship and ship-to-shore.
 |VTS |Vessel traffic service |A vessel traffic service is a marine traffic monitoring system established by public or port authorities, somewhat similar to air traffic control for aircraft.
 |IALA |International Association of Lighthouse Authorities |The International Association of Marine Aids to Navigation and Lighthouse Authorities is a non-profit organization founded collect and provide nautical expertise and advice.
