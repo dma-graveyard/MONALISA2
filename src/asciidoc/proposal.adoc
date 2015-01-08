@@ -272,6 +272,7 @@ This shall be achieved by designing new ASMs so that any variable-length data fi
 This shall be achieved by designing new ASMs so that no new extension mechanisms are introdued, to use a minimal no. of dispatch fields, and take dispatch fields into use in the following order: Message ID, Application Identifier, Message-specific dispatch.
 ====
 
+[[minimum_datatypes]]
 ==== Minimum no. of datatypes
 <<TOILS>> states that good practice is "for there to be just one type per natural kind; e.g. in a geolocation protocol all longitudes should be encoded with the same length, signedness, and special values. Ditto all latitudes, bearings, timestamp fields, etc.". This also holds for the encoding of numeric valuesfootnote:[Such as e.g. the "Rate of Turn field in the Common Navigation Block required taking a (sign-preserving) square root and then scaling" - which is different from all other numeric fields.] and the indication of non-existent values in order to avoid complicating exception and variants.
 
@@ -389,7 +390,7 @@ A search in <<ASMCOLL>> reveals to candidate ASM's worth considering for the "ta
 |Intended route	|8	|219	|1	|3	|initiation	|Danish Maritime Authority |<<ASM_219_01>>
 |===
 
-====== Comments on ASM DAC=001; FI=27
+====== Comments on ASM DAC=001; FI=27 - "Route information"
 
 Comments on the application specific message DAC=001; FI=27 defined by <<ASM_001_27>>:
 
@@ -399,18 +400,30 @@ It is unclear whether a tactical voyageplan (in MONALISA terms) is "important ro
 1. <<ASM_001_27>> specifies that "_13.4 In order to allow advance notice, this message should be transmitted prior to the start date and time specified for the routing information. It should not be transmitted more than one day in advance_". +
 +
 The statement that the message should not "should not be transmitted more than one day in advance" indicates that this message is for planning purposes, and not related to the imminent tactical situation.
-1. In the message layout (<<ASM_001_27>>) there is a field called "sender classification" which can only take one legal value: "1 = authority". Values 2-7 are reserved for future use. The value 0 is not defined in the specification, but since §13.1 indicates that the message can be used by vessels, perhaps 0 means that the sender is a vessel. But this is unclear.
+1. In the message layout <<ASM_001_27>> there is a field called "sender classification" which can only take one legal value: "1 = authority". Values 2-7 are reserved for future use. The value 0 is not defined in the specification, but since §13.1 indicates that the message can be used by vessels, perhaps 0 means that the sender is a vessel. But this is unclear.
 1. The data field "duration" occupies 18 bits and thus supports a max. value of 262142 minutes (using 262143 to indicate value not available) <<ASM_001_27>>. 262142 minutes equals 4.369 hours or 182 days. This is far beyong the needs for a tactical voyageplan and is therefore not efficient bit-usage for this purpose.
 1. In <<ASM_001_27>> the data field "number of waypoints" is redundant with message length and thus violates the design criteria <<single_point_of_truth>>. Since the specification states that "The number of waypoints is determined by the length of the message." the presence of this field is a mystery. 5 bits could be saved.
 1. The message does not support individual ETA or turn radius per waypoint or SOG between waypoints.
 
 In conclusion, DAC=001; FI=27 has an unclear specification, inefficient bit usage, and appears to be intended for planning purposes rather than the imminent tactical situation.
 
-DAC=001; FI=27 is therefore not suitable or recommmended for flow management.
+Therefore DAC=001; FI=27 is not suitable or recommmended for use in flow management.
 
-====== Comments on ASM DAC=219; FI=01
+====== Comments on ASM DAC=219; FI=01 - "Intended route"
 
 Comments on the application specific message DAC=001; FI=27 defined by <<ASM_219_01>>:
+
+1. It is well-defined _when_ this message must be sent.
+1. First waypoint is always active waypoint - thus the message only carries future intentions.
+1. The data field "ETA active WP" can be set one year ahead. The good thing about this, is that it complies with the <<minimum_datatypes>> design criteria; but the bad thing is that it wastes bits; since the lifespan of a tactical voyageplan can probably be expressed in the order of hundres of minutes correponding to 10 bits of information.
+1. In <<ASM_219_01>> the data field "number of waypoints" is redundant with message length and thus violates the design criteria <<single_point_of_truth>>. It is unclear whether message length or data field "number of waypoints" determines the no. of waypoint. In either case, the bits used for the data field "number of waypoints" could be saved.
+1. The message does not support individual ETA or turn radius per waypoint or SOG between waypoints.
+
+In conclusion, DAC=219; FI=01 has some of the same discrepancies as DAC=001; FI=27, but the events which trigger transmission are more well-defined, it is clear that this message is transmitted by vessels (not shore stations); and it is clear that this message intended for communicating immediate navigation intentions in the same way as required for tactical voyageplans.
+
+Therefore it is recommended
+- to use DAC=219; FI=01 as a means for vessels to broadcast their tactical voyageplans flow management.
+- to suggest one new message, with the same purpose as DAC=219; FI=01, but with the extended capability of expressing individual ETA and turn radius per waypoint.
 
 [[design_validation]]
 == Validation against design criteria
