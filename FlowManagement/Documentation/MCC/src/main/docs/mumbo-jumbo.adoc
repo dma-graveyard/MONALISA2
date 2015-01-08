@@ -1,0 +1,160 @@
+= Flow Management in the Maritime Cloud
+Niels Bech Nielsen <nbn@logical.dk>
+v0.1, JAN2015
+:doctype: book
+:sectanchors:
+:sectlinks:
+:sectnums:
+:linkattrs:
+:icons: font
+:experimental:
+:toc: right
+:toclevels: 2
+:numbered:
+:source-highlighter: coderay
+:source-language: asciidoc
+:idprefix:
+:idseparator: -
+:ast: &ast;
+:dagger: pass:normal[^&dagger;^]
+:y: icon:check[role="green"]
+:n: icon:times[role="red"]
+:c: icon:file-text-o[role="blue"]
+
+Document date: {localdate}
+
+:toc:
+
+== General information
+
+The purpose of this document is to provide an overview of the architecture related to information flow in Sea Traffic Management (STM) focusing on shipboard and shore-side components of the System Architecture needed to support flow management interactions.
+
+The intension of this document is that the architecture will be used by the implementing organisations involved in preparing trials on the concept of STM in the European Maritime Simulator Network (EMSN).
+
+== Background
+
+=== Flow Control Perspective
+
+This document focus on the sea traffic flow management, which is those interactions that take place between ships in a peer-to-peer situation or between ships and a coordination organisation (VTS – Vessel Traffic Service - conducting Traffic Organisation Services or the concept of an STCC – Sea Traffic Coordination Centre)
+In narrow channels (such as confined waters, archipelagos and other areas where there is limited space for manoeuvre outside the recommended fairway) where traffic density is high it is preferable to have a good flow of ships in order to increase safety as well as preventing unnecessary delays.
+
+
+==== Ship to Ship autonomous interaction
+
+When ships are operating autonomously the Officer On Watch (OOW) will most often handle these situations manually using available information from radar and AIS. Accuracy is low and prediction of what will happen in half an hour from now is unavailable. Instead of reducing speed with half a knot to avoid overtaking a vessel in a position that is not desirable in 30 minutes, ships maintain speed until a close encounter requires a sharp decrease of speed as a result.
+
+By sharing more and better information about the next few waypoints with other ships misunderstandings and close situations may be prevented. More specifically establishing a Closest Point of Approach (CPA) and/or Time of Closest Point of Approach (TCPA) with a fairly high accuracy well in advance of a close encounter situation should reduce the need for ships for applying Collision Regulations (COLREG) to avoid collisions.
+
+Note, there is no intention to replace or interfere with COLREG but rather provide more tools for a smoother flow and sharing of information to prevent unnecessary close situations.
+
+==== VTS/STCC interaction
+
+VTS or STCC will have local knowledge of the waters and the purpose of supporting coordination of sea traffic in narrow channels or other areas with dense traffic. Their interests are therefore the sum of all ships in their waters and the intentions of these ships at present or in the near future. By maintaining a good flow in the narrow channels they will increase safety for the ships as well as preventing unnecessary delays.
+
+As an example, about 33 000 to 35 000 ships over 300 GT pass every year the Sound between Sweden and Denmark (not counting the many ferries going back and forward across the Sound). In later years between 50 and 70 incidents have occurred every year where VTS operators have been forced to take action mostly to warn ships with too deep draughts or who were heading for shallows (Garbebring, 2011).
+
+During operations STCC may increase flow of narrow channels by offering route change suggestions to ships either through recommending vessels a change in route geometry or change of speed.
+STCC can also support route planning by providing waypoints or flow lines to interested parties. This makes it possible to incorporate “best practise” into a route plan without having local insight.
+
+==== Flow planning
+
+TBD How about planning for flow control... route templates, flow points, flow lines etc.
+
+
+=== MonaLisa 2.0
+
+The MonaLisa 2.0 project (http://monalisaproject.eu/) will establish the European Maritime Simulator Network (EMSN) with the aim of conducting and evaluating trials on STM (Sea Traffic Management).
+
+STM is the aggregation of the seaborne and shore-based functions (sea traffic services, maritime space management and sea traffic flow management) required to ensure the safe and efficient movement of vessels during all phases of operation.
+
+MonaLisa has drafted an architecture on EMSN, which includes aspects for flow control but most significantly specifies a data model for exchange of voyage information.
+
+
+=== Accseas
+
+TBD Is a project to … (the same but from the EDP perspective only, so in some sense simpler than the scope of MonaLisa but just as relevant for the scenario. They already have some maritime cloud integration so they have some best practise to lean on).
+
+
+=== In total
+
+TBD 
+Both MonaLisa and Accseas specify interactivity related to routes and route geometry changes, but none of them has the perspective of flow control. 
+
+== Analysis
+
+Starting from the established prototype of ACCSEAS this chapter investigates the communication scenarios for the Maritime Cloud and their supporting domain model.
+
+=== Accseas
+
+ACCSEAS identifies 3 communication scenarios for exchange of route information over Maritime Cloud
+
+* Intended Route Broadcast
+* Route Suggestion Service
+* Strategic Route Exchange
+
+The Intended Route Broadcast is a broadcast of a set of waypoints in the near future and/or in the near past of the current position. It originates from ships only and specifies a route or route segment of the planned route. Ships should monitor any deviation from the intended route and correct at intermediate steps.
+
+The Route Suggestion Service is a request/response service for a STCC to suggest and subsequently for ships to respond to a route change request. ATlong with the route suggested the STCC provides a description of the reason for requesting the change. The receiving ship is free to accept or reject the suggestion based on its own reasoning and route validation. A route in the Route Suggestion Service is called a Tactical Route, although this concept is not used in the Intended Route Broadcast.
+
+The Strategic Route Exchange is a conversation service for a ship to negotiate a route with the STCC. A ship may publish a Strategic Route and send to the STCC, which in turn may optimize the route based on local knowledge and other local regulations and respond with a changed route. The ship may then modify this route and send it back again for a second interaction. The conversation may be short or long until finally the ship accepts or completely discards the route.
+
+All three scenarios use a shared route domain model and there is no differentiating between a complete route and a route segment. The domain model encompasses an arbitrary route name and a list of waypoints with accompanying legs. There is no formal identification of a route or any guarantee whether the route used is complete or segmented.
+
+The use of schedule information are specified as planned ETA on waypoints, albeit on the intended route it also includes a list of calculated eta to the waypoints from the current position.
+
+=== MonaLisa
+
+In MonaLisa a similar concept is the voyage plan. It existing in multiple variants
+
+* Strategic Voyage Plan
+* Dynamic Voyage Plan
+* Tactical Voyage Plan
+
+The strategic voyage plan is a consideration of the ships route from berth to berth. It is mainly used for planning negotiation of the best route when considering all relevant factors. This may include asking an STCC or other entity about appropriate routes through certain areas (including narrow passages).
+
+Once a voyage plan needs to be executed it is referred to as the Dynamic Voyage Plan. There should be only one instance of a Dynamic Voyage Plan for any given voyage. However, it can be updated during the voyage after being appropriately approved.
+
+The Tactical Voyage Plan describe a subset of the Dynamic Voyage Plan for use in tactical scenarios. It is centered around the current position and future way points.
+
+In MonaLisa 2.0 these communication scenarios have been identified which include the Maritime Cloud:
+
+* Requesting a route template
+* Broadcast a Tactical Voyage Plan
+* Request a Tactival Voyage Plan
+* Tactical Route Negotiation
+
+Requesting Route Templates is similar to the Accseas Strategic Route Exchange but it is not clear how route templates are communicated, whether it is the the whole voyage or part elements to be negotiated. ACCSEAS specify a route as input to the Strategic Route Exchange, but it is not clear how MonaLisa seeds the request for a route template.
+
+Broadcasting Tactival Voyage Plan is similar to the Intended Route Broadcast, but MonaLisa also suggest a service for Requesting Tactical Voyage Plans. This could be useful in circumstances where a ship does not automatically broadcast a Tactical Voyage Plan. 
+
+Tactical Route Negotiation is similar to the Route Suggestion Service. The STCC suggests a route change on geometry and/or schedule in which the ship accepts or rejects. What is not clear from the MonaLisa documentation is how the suggestion is responded to by the ship, either explicitly or implicitly by broadcasting a new Tactical Voyage Plan when the Dynamic Voyage Plan has been updated.
+
+=== Technical aspects of the Domain Model
+
+The Route domain model of ACCSEAS and the Tactical Voyage Plan of MonaLisa are similar in the sense that they both contain the following aspects:
+
+* Waypoints and Legs
+* Schedule Information
+* Route Information
+
+However there are two important aspects of the MonaLisa specification that requires additional attention. The first one is the handling of optional data while the second one is handling vendor specific extensions.
+
+==== Optional Data
+
+If focusing on Route Information at first there is a significant difference between the ACCSEAS route message format and the Voyage Format specified in MonaLisa. ACCSEAS have only one attribute +routeName+ which appears to be a mandatory attribute (but may be empty) whereas MonaLisa have the same attribute (specifically mandatory), but also 19 optional attributes.
+
+The Voyage Format is intended for standard IP traffic whereas the Maritime Cloud format although more verbose than AIS may need to be sparse with the bandwith utilized.
+Considerations should be taken as to whether to include the optional attributes in the message or not.
+
+It is likely that much of the optional static information may be resolved by other messages in the future.
+
+==== Extension data
+
+The Voyage Format specifies an arbitrary extension to the voyage plan. This allows vendors to provide explicit information inside a Voyage Plan for subsequent processing when exchanged with other vendor specific equipment.
+
+The Maritime Cloud does not provide the ability to provide neither inheritance or extension mechanisms for this sort of data. It may be valuable to consider this aspect.
+ 
+== Publications
+
+* Garbebring, T. (2011). Passagen som aldrig sover: Ständig kontroll i sundet. In Sjörapporten, 7, 10-12. Norrköping: Sjöfartsverket.
+ 
