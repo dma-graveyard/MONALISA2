@@ -66,7 +66,7 @@ If flow management takes place in a self-organizaing manner between vessels on a
 ===== Tactical voyageplan
 In order to facilitate flow management vessels in the area must transmit their tactical voyageplan and optionally basic information concerning their manouvering capabilities.
 
-===== Suggested tactical voyageplan
+===== Flow management suggestion
 A suggested change to an tactical voyageplan is called a _flow management suggestion_. A flow management suggestion can be transmitted from either a coordination centre or a peer vessel. It can take one of two principal forms:
 
 1. Geometry-based (adding, deleting or changing waypoints)
@@ -124,7 +124,7 @@ The outcome is a set of message definitions, transmission criteria, test data, a
 | {counter:step} | The coordination centre detects, that a vessel has entered the controlled area. | The control centre transmits an addressed message to the vessel requesting it broadcast tactical voyageplans.footnote:[This is done even if the coordination centre already has this information in order to distribute this information to other vessels in the area.]
 | {counter:step} | The vessel receives the message. | The vessel responds by broadcasting message, which contains its tactical voyageplans.
 .2+| {counter:step} | The broadcast is received by the coordination centre (and likely some of the other vessels in the area). | The control centre recalculates optimal speeds per vessel.footnote:[with priority to suggest speed changes for V~0~ over other vessels, and fewest possible other vessels, and only for vessels intending to leave A.]
-   | *Exception:* The broadcast is never received by the coordination centre. | The coordination centre retransmits its message to the vessel.
+| *Exception:* The broadcast is never received by the coordination centre. | The coordination centre retransmits its message to the vessel.
 | {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
 .2+| {counter:step} | A vessel receives its flow management suggestion  from the coordination centre. | The navigator is alerted.
 | *Exception:* The flow management suggestion is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
@@ -176,7 +176,7 @@ In section <<design_validation>> it will be validated, that the suggested messag
 In accordance with <<ARCH>>, §3, all systems shall be designed with the end user (e.g. mariner, ship owner, operator), in mind.
 
 ====
-This shall be achieved, by carefully identifying and defining use cases expressed in user domain terms and approved by user domain experts (such as navigators) before the actual design of message conversations and message layouts takes place.
+This shall be achieved, by carefully identifying and defining use cases expressed in user domain terms and approved by user domain experts (such as navigators) before the actual design of message conversations and message layouts takes place. And by validating that the detailed message designs support the defined use cases.
 ====
 
 ==== Design for multivendor environment
@@ -335,37 +335,86 @@ Based on the <<use_cases>> it is noted, that the following messages are involved
 - *tactical voyageplan inquiry*. An addressed message transmitted by coordination centers and vessels to inquire a vessel about its tactical voyageplan.
 - *flow management suggestion*. An addressed message transmitted by coordination centers and vessels to suggest changes to a vessel's announced tactical voyageplan.
 
-==== Message payloads
+==== Message payloads and transmission triggers
 
-The payloads of these message types are the following:
+The payloads of these message types are the following.
 
-[cols="2,6"]
-.Payload of message type *tactical voyageplan inquiry*.
+===== Tactical voyageplan broadcast
+
+[cols="2,2,8"]
+.Information payload of message type *tactical voyageplan broadcast*.
 |===
-| Data field | Description
+| Data field | Type | Description
 
-| Sender | Sender identification
-| Receiver | Receiver identification
-| Timespan | Time period inquired
-|===
-
-[cols="2,6"]
-.Payload of message type *tactical voyageplan*.
-|===
-| Data field | Description
-
-| Sender | Sender identification
-| ... | ...
+| Sender | Required | Sender identification
+| Activation indicator | Required | Indication of whether the vessel cancels/deactives its voyageplan or whether it actively follows it.
+| Waypoints | Required | Positions of waypoints on the tactical voyageplan.
+| Active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
+| TCD | Optional | Ship's turning radius in the current area (read more in <<definitions>>).
+| ETA active waypoint | Required | Estimated time of arrival at active waypoint.
+| ETA last waypoint | Required | Estimated time of arrival at last waypoint.
+| ETA other waypoints | Optional | Estimated time of arrival at respective waypoint.
 |===
 
-[cols="2,6"]
-.Payload of message type *flow management suggestion *.
-|===
-| Data field | Description
+The message must only be transmitted by vessels.
 
-| Sender | Sender identification
-| ... | ...
+The message is only transmitted if vessel is conned along an active voyageplan. In that case, the following transmission triggers apply:
+
+1. Periodically.footnote:[Using AIS: Every six minutes (due to what is stated in <<AISSPEC5>> (§4.2.1) regarding sending interval for voyage related information]
+1. On voyage plan activation.
+1. On voyage plan change (change to waypoints or ETA at waypoints).
+1. On voyage plan deactivation/cancellation.
+1. On change of active waypoint.
+1. As reply to message "tactical voyageplan inquiry".
+
+Retransmission is not applicable.
+
+===== Tactical voyageplan inquiry
+
+[cols="2,2,8"]
+.Information payload of message type *tactical voyageplan broadcast*.
 |===
+| Data field | Type | Description
+
+| Receiver | Required | Receiver identification
+| Sender | Required | Sender identification
+
+|===
+
+The message can be transmitted by vessels or shore-based coordination centres.
+
+Retransmission is not applicable.
+
+The following transmission triggers apply:
+
+1. Periodically.footnote:[Using AIS: Every six minutes (due to what is stated in <<AISSPEC5>> (§4.2.1) regarding sending interval for voyage related information]
+1. On voyage plan activation.
+1. On voyage plan change (change to waypoints or ETA at waypoints).
+1. On voyage plan deactivation/cancellation.
+1. On change of active waypoint.
+1. As reply to message "tactical voyageplan inquiry".
+
+===== Flow management suggestion
+
+[cols="2,2,8"]
+.Information payload of message type *flow management suggestion*.
+|===
+| Data field | Type | Description
+
+| Sender | Required | Sender identification
+| Waypoints | Required | Positions of waypoints on the tactical voyageplan.
+| Active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
+| ETA active waypoint | Required | Suggested time of arrival at active waypoint.
+| ETA last waypoint | Required | Suggested time of arrival at last waypoint.
+| ETA other waypoints | Optional | Suggested time of arrival at respective waypoint.
+|===
+
+The message must only be transmitted by shore-based coordination centres. It can only be addressed to vessels following an active tactical voyageplan announced via the tactical voyageplan broadcast message.
+
+Retransmission is not applicable.
+
+1. On need to suggest changes to tactical voyageplan to support flow management. E.g. if a coordination center determines, that better overall flow can be achieved by the receiving vessel:
+- changing ETA to announced waypoints.
 
 === Detailed message design
 
@@ -500,6 +549,7 @@ The following typographic conventions are used throughout this paper.
 [glossary]
 == Glossary
 
+[[definitions]]
 === Definitions
 
 [cols="1,6"]
@@ -509,6 +559,7 @@ The following typographic conventions are used throughout this paper.
 |Strategic voyageplan | MONALISA 2 term for long term planning that consists of a route with a voyage number (and other Route information), a list of waypoints (geometry), a schedule, charter parties, legal conditions, and more. When a Strategic voyage plan is given to the ship as a voyage order it changes to _dynamic voyageplan_.
 |Dynamic voyageplan | MONALISA 2 term for an optimised version of the _strategic voyageplan_
 |Tactical voyageplan | MONALISA 3 term for a dynamic voyageplan in conning mode; i.e. under tactical execution. Whole or parts of the tactical voyage plan can be transmitted to increase situational awareness and support flow management.
+|Turning circle diameter | Merchant ships usually turn in a circle having a diameter of about 3–4 times the length between perpendiculars. TCD varies little with speed, but can vary significantly between manouvers in deep and shallow waters. TCD depends on the size and geometry of a vessel, the size of its rudder, and the no. and characteristics of propellers.
 |===
 
 === Abbreviations
@@ -528,7 +579,8 @@ The following typographic conventions are used throughout this paper.
 |ITU |International Telecommunication Union |The International Telecommunication Unio is an agency of the United Nations that is responsible for issues that concern information and communication technologies, such as coordinating the shared global use of the radio spectrum, promoting international cooperation in assigning satellite orbits, assisting in the development of worldwide technical standards.
 |ASCII |American Standard Code for Interformation Interchange | A character encoding scheme used in computers, communications equipment, and other devices that use text, to represent text with numbers.
 |ETA |Estimated time of arrival |-
-|SOG |Speed over ground |Speed made good measured in knots.
+|SOG |Speed over ground |Speed made good (often measured in knots).
+|TCD |Turning circle diameter| Turning circle diameter (often measured in nautical miles).
 |===
 
 [bibliography]
@@ -570,7 +622,7 @@ The following typographic conventions are used throughout this paper.
 The following AIS message definitions are proposed for flow management support.
 
 === Tactical voyageplan broadcast
-Formally proposed specification as available in <<ASM_219_01>>.
+Formally proposed specification copied from <<ASM_219_01>>.
 
 ====
 
@@ -632,10 +684,10 @@ Intended route (broadcast)
 |UTC Minute |6 |0 - 59 +
 0 = not available = default
 |Duration |18 |Minutes from ETA at active waypoint to ETA at the last broadcast waypoint. The duration allows for the calculation of an average intended speed on the broadcast route. +
- +
++
 0 = not available = default
 |Number of Waypoints |5 |Number of Waypoints +
- +
++
 1 - 16 +
 0 = no active route = cancel route +
 17 - 31 (not used)
@@ -660,9 +712,9 @@ Waypoints
 
 ====
 
-
-
-
 === Tactical voyageplan broadcast, extended
+Proposed specification of tactical voyageplan broadcast, extended
+
+
 === Tactical voyageplan inquiry
 === Flow management suggestion
