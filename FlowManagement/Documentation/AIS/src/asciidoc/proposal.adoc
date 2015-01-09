@@ -328,6 +328,12 @@ This shall be achieved by supplying example datagrams together with a human-read
 === High-level design
 In the high-level design of support for flow management no assumptions are made about the characteristics of the underlying transport layer. Focus here, is to identify which pieces of information need to be exchanged, between whom, and when. Following this are detailed specifications for mapping this outcome to real-world protocols, such as AIS <<AISSPEC5>>.
 
+The messages to support flow management must have following characteristics:
+
+- The message payload should be related to the current tactical execution, the imminent future. I.e. the message should not be designed for planning purposes or announcement of future intentions.
+- The message should have carrying capability for as many waypoints as possible.
+- The message should optionally support ETA or SOG per waypoint and vessel's turn radius.
+
 ==== Message types
 Based on the <<use_cases>> it is noted, that the following messages are involved in flow management:
 
@@ -337,7 +343,7 @@ Based on the <<use_cases>> it is noted, that the following messages are involved
 
 ==== Message payloads and transmission triggers
 
-The payloads of these message types are the following.
+The sugested payloads and transmission triggers of these message types are the following.
 
 ===== Tactical voyageplan broadcast
 
@@ -387,12 +393,15 @@ Retransmission is not applicable.
 
 The following transmission triggers apply:
 
-1. Periodically.footnote:[Using AIS: Every six minutes (due to what is stated in <<AISSPEC5>> (§4.2.1) regarding sending interval for voyage related information]
-1. On voyage plan activation.
-1. On voyage plan change (change to waypoints or ETA at waypoints).
-1. On voyage plan deactivation/cancellation.
-1. On change of active waypoint.
-1. As reply to message "tactical voyageplan inquiry".
+1. On need by control centre to receive tactical voyageplan from a vessel. In case of e.g.:
+- Vessel's arrival to controlled area.
+- Previously announced tactical voyageplan is invalid (e.g. expired, or vessel's manouvers deviate significantly from it).
+- Loss of data in control center.
+1. On need by vessel to receive tactical voyageplan from another vessel.
+- The inquired vessel's intentions are unknown to the inquirying vessel; e.g. in case of
+* Tactical voyageplan was never transmitted by inquired vessel.
+* Tactical voyageplan was never received by inquirying vessel.
+* Information about another vessel's tactical voyageplan was lost onboard the inquirying vessel (e.g. due to system restart or improper operation).
 
 ===== Flow management suggestion
 
@@ -423,11 +432,6 @@ Retransmission is not applicable.
 ==== MSDL
 
 ==== AIS
-The AIS messages to support flow management should have priority of the following characteristics:
-
-- The message payload should be related to the current tactical execution, the imminent future. I.e. the message should not be designed for planning purposes or announcement of future intentions.
-- The message should have carrying capability for maximum no. of waypoints
-- The message should optionally support ETA per waypoint, turn radius per waypoint and SOG per leg between waypoints.
 
 ===== Existing ASMs
 A search in <<ASMCOLL>> reveals to candidate ASM's worth considering for the "tactical voyageplan" broadcast:
@@ -439,9 +443,9 @@ A search in <<ASMCOLL>> reveals to candidate ASM's worth considering for the "ta
 |Intended route	|8	|219	|1	|3	|initiation	|Danish Maritime Authority |<<ASM_219_01>>
 |===
 
-====== Comments on ASM DAC=001; FI=27 - "Route information"
+====== Review of ASM DAC=001; FI=27 - "Route information"
 
-Comments on the application specific message DAC=001; FI=27 defined by <<ASM_001_27>>:
+Review of the application specific message DAC=001; FI=27 defined by <<ASM_001_27>> in the context of flow management yields the following comments:
 
 1. <<ASM_001_27>> specifies that "_13.1 This message ... should only be used in when important route information ... – not already provided by current official nautical charts or publications – needs to be relayed by authorities or vessels_". +
 +
@@ -458,9 +462,9 @@ In conclusion, DAC=001; FI=27 has an unclear specification, inefficient bit usag
 
 Therefore DAC=001; FI=27 is not suitable or recommmended for use in flow management.
 
-====== Comments on ASM DAC=219; FI=01 - "Intended route"
+====== Review of ASM DAC=219; FI=01 - "Intended route"
 
-Comments on the application specific message DAC=001; FI=27 defined by <<ASM_219_01>>:
+Review of the application specific message DAC=219; FI=01 defined by <<ASM_219_01>> in the context of flow management yields the following comments:
 
 1. It is well-defined _when_ this message must be sent.
 1. First waypoint is always active waypoint - thus the message only carries future intentions.
@@ -474,17 +478,23 @@ Therefore it is recommended
 - to use DAC=219; FI=01 as a means for vessels to broadcast their tactical voyageplans flow management.
 - to suggest one new message, with the same purpose as DAC=219; FI=01, but with the extended capability of expressing individual ETA and turn radius per waypoint.
 
-===== x
-Following the arguments above, the following AIS messages are required to be used and defined for use in flow management:
+==== Suggested AIS messages to support flow management
+Following the arguments above, the following AIS messages are suggested to be used or defined for use in flow management:
 
 |===
 |Message purpose |Message type |Defined by
 
-|Tactical voyageplan broadcast           | ASM DAC=219; FI=01 |<<ASM_219_01>>
-|Tactical voyageplan broadcast, extended | ASM DAC=219; FI=02 |_To be defined_
-|Tactical voyageplan inquiry             | ASM DAC=001; FI=03 |_To be defined_
-|Flow management suggestion              | ASM DAC=219; FI=04 |_To be defined_
+|Tactical voyageplan broadcast           | ASM DAC=219; FI=01 |<<ASM_219_01>> +
+See <<ais_message_definitions>>.
+|Tactical voyageplan broadcast, extended | ASM DAC=219; FI=02 |_To be defined_. +
+See <<ais_message_definitions>>.
+|Tactical voyageplan inquiry             | ASM DAC=001; FI=03 |_To be defined_ +
+See <<ais_message_definitions>>.
+|Flow management suggestion              | ASM DAC=219; FI=04 |_To be defined_ +
+See <<ais_message_definitions>>.
 |===
+
+The suggested detailed definition of the three message types _to be defined_ are stated in the appendix: <<ais_message_definitions>>.
 
 [[design_validation]]
 == Validation against design criteria
@@ -559,7 +569,7 @@ The following typographic conventions are used throughout this paper.
 |Strategic voyageplan | MONALISA 2 term for long term planning that consists of a route with a voyage number (and other Route information), a list of waypoints (geometry), a schedule, charter parties, legal conditions, and more. When a Strategic voyage plan is given to the ship as a voyage order it changes to _dynamic voyageplan_.
 |Dynamic voyageplan | MONALISA 2 term for an optimised version of the _strategic voyageplan_
 |Tactical voyageplan | MONALISA 3 term for a dynamic voyageplan in conning mode; i.e. under tactical execution. Whole or parts of the tactical voyage plan can be transmitted to increase situational awareness and support flow management.
-|Turning circle diameter | Merchant ships usually turn in a circle having a diameter of about 3–4 times the length between perpendiculars. TCD varies little with speed, but can vary significantly between manouvers in deep and shallow waters. TCD depends on the size and geometry of a vessel, the size of its rudder, and the no. and characteristics of propellers.
+|Turning circle diameter | Merchant ships usually turn in a circle having a diameter of about 3–4 times the length between perpendiculars. TCD varies little with speed, but can vary significantly between manouvers in deep and shallow waters. TCD depends on the size and geometry of a vessel, the size of its rudder, and the no. and characteristics of propellers. Cf. <<SBTCD>> for more.
 |===
 
 === Abbreviations
@@ -616,7 +626,10 @@ The following typographic conventions are used throughout this paper.
 
 [[[ASM_219_01]]] "Specification of intended route - (broadcast)". Specification of the AIS application specific message for intended route broadcast. http://www.e-navigation.nl/content/intended-route.
 
+[[[SBTCD]]] Blog entry on "Turning Circle Diameter for a Container Ship". http://shipsbusiness.com/turning-circle.html.
+
 [appendix]
+[[ais_message_definitions]]
 == AIS message definitions
 
 The following AIS message definitions are proposed for flow management support.
@@ -717,4 +730,69 @@ Proposed specification of tactical voyageplan broadcast, extended
 
 
 === Tactical voyageplan inquiry
+Proposed specification of an AIS message to implement message "Tactical voyage plan inquiry":
+
+====
+
+The message can be transmitted by vessels or shore-based coordination centres.
+
+Application level retransmission -- except in the sense of missing protocol acknowledgement as per <<AISSPEC5>>, Annex 8 §3.5 -- is not applicable.
+
+The following events should trigger transmission:
+
+1. On need by control centre to receive tactical voyageplan from a vessel. In case of e.g.:
+- A vessel's arrival to controlled area.
+- A vessel's previously announced tactical voyageplan is considered invalid by the inquirer, e.g. because
+* the timestamp of the active waypoint is in the past.
+* the vessel's manouvers deviate significantly from its announced tactical voyageplan.
+- Loss of data in control center.
+1. On need by vessel to receive tactical voyageplan from another vessel.
+- The inquired vessel's intentions are unknown to the inquirying vessel; e.g. in case of
+* Tactical voyageplan was never transmitted by inquired vessel.
+* Tactical voyageplan was never received by inquirying vessel.
+* Information about another vessel's tactical voyageplan was lost onboard the inquirying vessel (e.g. due to system restart or improper operation).
+
+*Registrant*: Danish Maritime Authority +
+*Message number*: 8 +
+*DAC*:  219 +
+*FI*:  3 +
+*Used by*: DMA, MONALISA 2 +
+*Number of Slots (max)*:  1 +
+*Reporting rate*:  See "transmission triggers" above +
+*How portrayed*: -.
+
+*Permitted as from*:  - +
+*Status*:  draft in progress +
+*Technical Point of contact*: +
+Jens Kristian Jensen +
+Danish Maritime Authority +
+jkj@dma.dk +
+
+*Details*: +
+Tactical voyageplan inquiry
+
+[cols="4,2,12"]
+|===
+|Parameter |No. of bits |Description
+
+|Message ID |6 |Identifier for Message 6; always 6.footnote:[Message type 25 could also be considered. But this message type is very rate and not known to be used in any other applications.]
+|Repeat Indicator |2 |Used by the repeater to indicate how many times a message has been repeated. +
+0 - 3 +
+0 = default +
+3 = do not repeat anymore
+|Source ID |30 |MMSI number of source station.
+|Sequence number |2 |0-3; refer to <<AISSPEC5>> §5.3.1, Annex 2
+|Destination ID |30 |MMSI number of destination station.
+|Retransmit Flag |1 |Retransmit Flag should be set upon retransmission: +
+0 = no retransmission = default +
+1 = retransmitted.
+|Spare |1 |Not used. Set to zero.
+|IAI |16 |*DAC = 219; FI = 3*
+|*Total* |*80* |*Occupies 1 slot.*
+|===
+
+====
+
 === Flow management suggestion
+
+x
