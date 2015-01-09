@@ -111,9 +111,7 @@ The outcome is a set of message definitions, transmission criteria, test data, a
 [[use_cases]]
 == Use cases
 
-=== Use cases for controlled flow management
-
-==== Use case: Vessel enters the controlled area
+=== Use case: Vessel enters the controlled area
 
 {set:step:0}
 [cols="1,5,5"]
@@ -131,7 +129,7 @@ The outcome is a set of message definitions, transmission criteria, test data, a
 | {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
 |===
 
-==== Use case: Coordination centre determintes new flow management suggestion s needed
+=== Use case: Coordination centre determintes new flow management suggestion s needed
 
 {set:step:0}
 [cols="1,5,5"]
@@ -146,22 +144,16 @@ The outcome is a set of message definitions, transmission criteria, test data, a
 | {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
 |===
 
-==== Use case: Vessel broadcasts its tactical voyageplan
+=== Use case: Vessel broadcasts its tactical voyageplan
 
-==== Use case: Vessel changes or resends its tactical voyageplan
+=== Use case: Vessel changes or resends its tactical voyageplan
 
-==== Use case: Vessel cancels its tactical voyageplan
+=== Use case: Vessel cancels its tactical voyageplan
 
-==== Use case: A tactical voyageplan expires
+=== Use case: A tactical voyageplan expires
 
-==== Use case: A vessel suggests tactical voyageplan for another vessel
+=== Use case: A vessel suggests tactical voyageplan for another vessel
 (in a controlled flow management scenario)
-
-...
-
-=== Use cases for autonomous flow management
-
-...
 
 == Design criteria
 Messaging in the maritime domain has been available many years and communication standards have evolved and been added and augmented several times to accomodate the increasing demand for handling more and more complex scenarios in the maritime domain.
@@ -341,7 +333,7 @@ Based on the <<use_cases>> it is noted, that the following messages are involved
 - *tactical voyageplan inquiry*. An addressed message transmitted by coordination centers and vessels to inquire a vessel about its tactical voyageplan.
 - *flow management suggestion*. An addressed message transmitted by coordination centers and vessels to suggest changes to a vessel's announced tactical voyageplan.
 
-==== Message payloads and transmission triggers
+==== Payloads and transmission triggers
 
 The sugested payloads and transmission triggers of these message types are the following.
 
@@ -425,11 +417,22 @@ Retransmission is not applicable.
 1. On need to suggest changes to tactical voyageplan to support flow management. E.g. if a coordination center determines, that better overall flow can be achieved by the receiving vessel:
 - changing ETA to announced waypoints.
 
+==== Use case scenarios
+
+Vessel A arrives at area.
+
+It has routinely broadcast message "tactical voyageplan" or "tactical voyageplan, extended"
+If not: The control center sends message "tactical voyageplan, inquiry"
+
+*TBD*
+
 === Detailed message design
 
 ==== ASN.1
+*TBD*
 
 ==== MSDL
+*TBD*
 
 ==== AIS
 
@@ -547,87 +550,6 @@ The suggested detailed definition of the three message types _to be defined_ are
 
 :numbered!:
 
-== Reader's guide
-
-The following typographic conventions are used throughout this paper.
-
-=== Icons
-|===
-|icon:cogs[] | A ...
-|===
-
-[glossary]
-== Glossary
-
-[[definitions]]
-=== Definitions
-
-[cols="1,6"]
-|===
-|Term |Definition
-
-|Strategic voyageplan | MONALISA 2 term for long term planning that consists of a route with a voyage number (and other Route information), a list of waypoints (geometry), a schedule, charter parties, legal conditions, and more. When a Strategic voyage plan is given to the ship as a voyage order it changes to _dynamic voyageplan_.
-|Dynamic voyageplan | MONALISA 2 term for an optimised version of the _strategic voyageplan_
-|Tactical voyageplan | MONALISA 3 term for a dynamic voyageplan in conning mode; i.e. under tactical execution. Whole or parts of the tactical voyage plan can be transmitted to increase situational awareness and support flow management.
-|Turning circle diameter | Merchant ships usually turn in a circle having a diameter of about 3–4 times the length between perpendiculars. TCD varies little with speed, but can vary significantly between manouvers in deep and shallow waters. TCD depends on the size and geometry of a vessel, the size of its rudder, and the no. and characteristics of propellers. Cf. <<SBTCD>> for more.
-|===
-
-=== Abbreviations
-
-[cols="1,3,3"]
-|===
-|Abbreviation |Expansion | Description
-
-|MSDL |Maritime Service Definition Language | A computer language used to defined services in a maritime
-|AIS |Automatic Identification System |A tracking system used on ships and by vessel traffic services for identifying and locating vessels by electronically exchanging data with other nearby ships, base stations, and satellites.
-|ASM |Application Specific Message |Used only in the context of the automatic identification system, as a method of allowing "competent authorities" to define additional AIS message subtypes, based on message types 6, 8, 25, and 26 which support a custom payload.
-|CC | Coordination Center |A term specific to this document invented to cover all types of VTS, STCC, and other centres with responsibility for traffic management and coordination.
-|STM |Sea Traffic Management |The aggregation of the seaborne and shore-based functions (sea traffic services, maritime space management and sea traffic flow management) required to ensure the safe and efficient manouvering of vessels during all phases of operation.
-|STCC |Sea Traffic Coordination Center |A central, shore-based, hub maintaining record of all vessels at sea using AIS and/or radar to enable managed distribution of vessel routes between ship-to-ship and ship-to-shore.
-|VTS |Vessel traffic service |A vessel traffic service is a marine traffic monitoring system established by public or port authorities, somewhat similar to air traffic control for aircraft.
-|IALA |International Association of Lighthouse Authorities |The International Association of Marine Aids to Navigation and Lighthouse Authorities is a non-profit organization founded collect and provide nautical expertise and advice.
-|ITU |International Telecommunication Union |The International Telecommunication Unio is an agency of the United Nations that is responsible for issues that concern information and communication technologies, such as coordinating the shared global use of the radio spectrum, promoting international cooperation in assigning satellite orbits, assisting in the development of worldwide technical standards.
-|ASCII |American Standard Code for Interformation Interchange | A character encoding scheme used in computers, communications equipment, and other devices that use text, to represent text with numbers.
-|ETA |Estimated time of arrival |-
-|SOG |Speed over ground |Speed made good (often measured in knots).
-|TCD |Turning circle diameter| Turning circle diameter (often measured in nautical miles).
-|===
-
-[bibliography]
-== Bibliography
-
-=== Standards and specifications
-
-[[[AISSPEC5]]] "Recommendation ITU-R M.1371-5: Technical characteristics for an automatic identification system using time division multiple access in the VHF maritime mobile frequency band". February, 2014. International Telecommunications Union. Available from http://www.itu.int/rec/R-REC-M.1371-5-201402-I.
-
-[[[AISG289]]] "Guidance on the use of AIS application-specific messages". Published as SN.1/Circ.289 by the International Maritime Organization (IMO). June 2, 2010.
-
-[[[IALA144]]] "IALA Recommendation e-NAV - 144 On Harmonized implementation of Application Specific Messages (ASM)". Edition 1. June, 2011. International Association of Marine Aids to Navigation and Lighthouse Authorities.
-
-[[[AISASM]]] "Application Specific Messages". IALA maintained collection of regional applications for AIS Application Specific Messages in use. http://www.e-navigation.nl/asm.
-
-=== Articles and papers
-
-[[[TOILS]]] "The Toils of AIS: A Case Study in Application Protocol Design And Analysis" by Eric S. Raymond and Kurt Schwehr. 2013. Available from http://gitorious.org/toils-of-ais/toils-of-ais/
-
-[[[ARCH]]] "Architecture for STM in EMSN and STM Data format for Route Exchange".
-
-=== Web resources
-
-[[[ASN.1]]] "Abstract Syntax Notation One (ASN.1)". A standard and notation that describes rules and structures for representing, encoding, transmitting, and decoding data in telecommunications and computer networking. http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One.
-
-[[[BDEC]]] "bdec". A set of tools for creating decoders and encoders for binary files given a high level specification. http://www.protocollogic.com/docs/tutorial.html.
-
-[[[MONALISA2]]] "MONALISA 2.0". A joint project from 10 different countries in the European Union to introduce Sea Traffic Management (STM) and make real-time information available to all interested and authorised parties in the maritime world. http://monalisaproject.eu/.
-
-[[[ASMCOLL]]] "Application Specific Messages". A collection of application specific AIS messages approved by IALA-AISM. http://www.e-navigation.nl/asm.
-
-[[[ASM_001_27]]] "Specification of Route information - (broadcast)". Specification of the AIS application specific message for route information broadcast. http://www.e-navigation.nl/content/route-information.
-
-[[[ASM_219_01]]] "Specification of intended route - (broadcast)". Specification of the AIS application specific message for intended route broadcast. http://www.e-navigation.nl/content/intended-route.
-
-[[[SBTCD]]] Blog entry on "Turning Circle Diameter for a Container Ship". http://shipsbusiness.com/turning-circle.html.
-
 [appendix]
 [[ais_message_definitions]]
 == AIS message definitions
@@ -728,6 +650,82 @@ Waypoints
 === Tactical voyageplan broadcast, extended
 Proposed specification of tactical voyageplan broadcast, extended
 
+The message must only be transmitted by vessels.
+
+The message is only transmitted if vessel is conned along an active voyageplan. In that case, the following transmission triggers apply:
+
+1. Periodically.footnote:[Using AIS: Every six minutes (due to what is stated in <<AISSPEC5>> (§4.2.1) regarding sending interval for voyage related information]
+1. On voyage plan activation.
+1. On voyage plan change +
+(change to waypoints or change of ETA to any waypoint of more than 10 minutes).
+1. On voyage plan deactivation/cancellation.
+1. On change of active waypoint.
+1. As reply to message "tactical voyageplan inquiry".
+
+Retransmission is not applicable.
+
+Waypoints are denoted WP~0~, WP~1~, WP~i~,..., WP~n~ and are navigated in sequence. WP~0~ is the _active waypoint_ currently steered towards. WP~i~, where i ≥ 1, is called _following waypoints_.
+
+[cols="4,2,12"]
+|===
+|Parameter |No. of bits |Description
+
+|Message ID |6 |Identifier for Message 8; always 8.
+|Repeat Indicator |2 |Used by the repeater to indicate how many times a message has been repeated. +
+0 - 3 +
+0 = default +
+3 = do not repeat anymore
+|Source ID |30 |MMSI number of source station.
+|Spare |1 |Not used. Set to zero.
+|IAI |16 |*DAC = 219; FI = 2*
+3+^.^|_Message may end here to indicate cancellation of previously announced tactical voyageplan._|
+TCD |7 |Turn cicle diameter. +
+Type: Integer. Unit: 1/100 of a nautical mile. +
+0 = no value +
+1 - 127 = turn circle diameter of 0.01 nm - 1.27nm
+.4+|ETA of WP~0~ |4 |UTC month +
+Integer value +
+Values outside the range 1-12 are illegal and must not be used.
+|5 |UTC day +
+Integer value +
+Values outside the range 1-31 are illegal and must not be used.
+|5 |UTC hour +
+Integer value +
+Values outside the range 0-23 are illegal and must not be used.
+|6 |UTC minute +
+Integer value +
+Values outside the range 0-59 are illegal and must not be used.
+|Active waypoint, longitude |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
+|Active waypoint, latitude |27 | Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+|Next waypoints with ETA | n × 63 | Variable no. of planned waypoints and ETA's. +
+n ∈ {0..14} +
+ See table 2
+|*Total* | *55-1019*
+|55 bits for cancellation of tactical voyageplan. +
+137-1019 bits for tactical voyageplan with 0..14 following waypoints.
+ +
+e.g. 137 bits for n=0, 200 bits for n=1, 1019 bits for n=14. +
+ +
+*Occupies X – X slots.* +
+1 - 4 waypoints = ? slots +
+5 - 8 waypoints = ? slots +
+9 - 12 waypoints = ? slots +
+13 – 14 waypoints = ? slots
+|===
+
+Table 2. Waypoints with relative ETA's.
+[cols="4,2,12"]
+|===
+|Parameter |No. of bits |Description
+
+|Longitude of WP~n~ |28 |Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
+|Latitude of WP~n~  |27 |Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+|Relative ETA at WP~n~ | 8 | Relative ETA from previous waypoint; measured in minutes. +
+Integer value; [0-255]. +
+0 = Not used. Illegal value. +
+1 - 255 = Relative ETA measured in number of minutes from previous waypoint.
+|*Total* |*63* |
+|===
 
 === Tactical voyageplan inquiry
 Proposed specification of an AIS message to implement message "Tactical voyage plan inquiry":
@@ -736,7 +734,7 @@ Proposed specification of an AIS message to implement message "Tactical voyage p
 
 The message can be transmitted by vessels or shore-based coordination centres.
 
-Application level retransmission -- except in the sense of missing protocol acknowledgement as per <<AISSPEC5>>, Annex 8 §3.5 -- is not applicable.
+Retransmission -- except in the sense of missing protocol acknowledgement as per <<AISSPEC5>>, Annex 8 §3.5 -- is not applicable.
 
 The following events should trigger transmission:
 
@@ -796,3 +794,84 @@ Tactical voyageplan inquiry
 === Flow management suggestion
 
 x
+
+== Reader's guide
+
+The following typographic conventions are used throughout this paper.
+
+=== Icons
+|===
+|icon:cogs[] | A ...
+|===
+
+[glossary]
+== Glossary
+
+[[definitions]]
+=== Definitions
+
+[cols="1,6"]
+|===
+|Term |Definition
+
+|Strategic voyageplan | MONALISA 2 term for long term planning that consists of a route with a voyage number (and other Route information), a list of waypoints (geometry), a schedule, charter parties, legal conditions, and more. When a Strategic voyage plan is given to the ship as a voyage order it changes to _dynamic voyageplan_.
+|Dynamic voyageplan | MONALISA 2 term for an optimised version of the _strategic voyageplan_
+|Tactical voyageplan | MONALISA 3 term for a dynamic voyageplan in conning mode; i.e. under tactical execution. Whole or parts of the tactical voyage plan can be transmitted to increase situational awareness and support flow management.
+|Turning circle diameter | Merchant ships usually turn in a circle having a diameter of about 3–4 times the length between perpendiculars. TCD varies little with speed, but can vary significantly between manouvers in deep and shallow waters. TCD depends on the size and geometry of a vessel, the size of its rudder, and the no. and characteristics of propellers. Cf. <<SBTCD>> for more.
+|===
+
+=== Abbreviations
+
+[cols="1,3,3"]
+|===
+|Abbreviation |Expansion | Description
+
+|MSDL |Maritime Service Definition Language | A computer language used to defined services in a maritime
+|AIS |Automatic Identification System |A tracking system used on ships and by vessel traffic services for identifying and locating vessels by electronically exchanging data with other nearby ships, base stations, and satellites.
+|ASM |Application Specific Message |Used only in the context of the automatic identification system, as a method of allowing "competent authorities" to define additional AIS message subtypes, based on message types 6, 8, 25, and 26 which support a custom payload.
+|CC | Coordination Center |A term specific to this document invented to cover all types of VTS, STCC, and other centres with responsibility for traffic management and coordination.
+|STM |Sea Traffic Management |The aggregation of the seaborne and shore-based functions (sea traffic services, maritime space management and sea traffic flow management) required to ensure the safe and efficient manouvering of vessels during all phases of operation.
+|STCC |Sea Traffic Coordination Center |A central, shore-based, hub maintaining record of all vessels at sea using AIS and/or radar to enable managed distribution of vessel routes between ship-to-ship and ship-to-shore.
+|VTS |Vessel traffic service |A vessel traffic service is a marine traffic monitoring system established by public or port authorities, somewhat similar to air traffic control for aircraft.
+|IALA |International Association of Lighthouse Authorities |The International Association of Marine Aids to Navigation and Lighthouse Authorities is a non-profit organization founded collect and provide nautical expertise and advice.
+|ITU |International Telecommunication Union |The International Telecommunication Unio is an agency of the United Nations that is responsible for issues that concern information and communication technologies, such as coordinating the shared global use of the radio spectrum, promoting international cooperation in assigning satellite orbits, assisting in the development of worldwide technical standards.
+|ASCII |American Standard Code for Interformation Interchange | A character encoding scheme used in computers, communications equipment, and other devices that use text, to represent text with numbers.
+|ETA |Estimated time of arrival |-
+|SOG |Speed over ground |Speed made good (often measured in knots).
+|TCD |Turning circle diameter| Turning circle diameter (often measured in nautical miles).
+|===
+
+[bibliography]
+== Bibliography
+
+=== Standards and specifications
+
+[[[AISSPEC5]]] "Recommendation ITU-R M.1371-5: Technical characteristics for an automatic identification system using time division multiple access in the VHF maritime mobile frequency band". February, 2014. International Telecommunications Union. Available from http://www.itu.int/rec/R-REC-M.1371-5-201402-I.
+
+[[[AISG289]]] "Guidance on the use of AIS application-specific messages". Published as SN.1/Circ.289 by the International Maritime Organization (IMO). June 2, 2010.
+
+[[[IALA144]]] "IALA Recommendation e-NAV - 144 On Harmonized implementation of Application Specific Messages (ASM)". Edition 1. June, 2011. International Association of Marine Aids to Navigation and Lighthouse Authorities.
+
+[[[AISASM]]] "Application Specific Messages". IALA maintained collection of regional applications for AIS Application Specific Messages in use. http://www.e-navigation.nl/asm.
+
+=== Articles and papers
+
+[[[TOILS]]] "The Toils of AIS: A Case Study in Application Protocol Design And Analysis" by Eric S. Raymond and Kurt Schwehr. 2013. Available from http://gitorious.org/toils-of-ais/toils-of-ais/
+
+[[[ARCH]]] "Architecture for STM in EMSN and STM Data format for Route Exchange".
+
+=== Web resources
+
+[[[ASN.1]]] "Abstract Syntax Notation One (ASN.1)". A standard and notation that describes rules and structures for representing, encoding, transmitting, and decoding data in telecommunications and computer networking. http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One.
+
+[[[BDEC]]] "bdec". A set of tools for creating decoders and encoders for binary files given a high level specification. http://www.protocollogic.com/docs/tutorial.html.
+
+[[[MONALISA2]]] "MONALISA 2.0". A joint project from 10 different countries in the European Union to introduce Sea Traffic Management (STM) and make real-time information available to all interested and authorised parties in the maritime world. http://monalisaproject.eu/.
+
+[[[ASMCOLL]]] "Application Specific Messages". A collection of application specific AIS messages approved by IALA-AISM. http://www.e-navigation.nl/asm.
+
+[[[ASM_001_27]]] "Specification of Route information - (broadcast)". Specification of the AIS application specific message for route information broadcast. http://www.e-navigation.nl/content/route-information.
+
+[[[ASM_219_01]]] "Specification of intended route - (broadcast)". Specification of the AIS application specific message for intended route broadcast. http://www.e-navigation.nl/content/intended-route.
+
+[[[SBTCD]]] Blog entry on "Turning Circle Diameter for a Container Ship". http://shipsbusiness.com/turning-circle.html.
