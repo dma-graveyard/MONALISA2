@@ -53,21 +53,21 @@ M.Sc. Jens Kristian Jensen <JKJ@dma.dk>
 ==== Flow management
 As defined by <<ARCH>> flow management is communication which takes place between ships in a peer-to-peer situation, or between ships and a coordinating organisation (e.g. VTS, STCC) in order to:
 
-1. Increase safety and prevent delays through a good flow in narrow channels with high traffic density
-1. Support vessel in arriving at final destination in due time as efficient as possible
+1. Increase safety and prevent delays through a good flow in narrow channels with high traffic density.
+1. Support vessel in arriving at final destination in due time as efficient as possible.
 1. Provide information to interested parties about planned and predicted time of arrival to final destination or other point of interest.
 
 For item 1 the term "good" means that collisions and dangerous situations are avoided and that vessels can safely follow their announced tactical voyageplan through the area.
 
-Flow _management_ is based on knowledge of vessels' tactical voyageplans; i.e. announcements from each vessel regarding their intended manouvers in the immediate short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for the coordination centre or the nearby vessels to suggest and negotiate tactical voyageplans to obtain a "good" flow. It is this process which is called _flow management_.
+Flow _management_ is based on knowledge of vessels' tactical voyageplans; i.e. announcements from each vessel regarding their intended manouvers in the immediate short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for the coordination centre or the nearby vessels to suggest tactical voyageplans to a vessel with the purpose of obtaining a "good" overall flow. This process is called _flow management_.
 
 If flow management takes place in a self-organizaing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- all vessels can safely and efficiently follow their tactical voyageplans through their entire passage of the area.
 
 ===== Tactical voyageplan
-In order to facilitate flow management vessels in the area must transmit their tactical voyageplan and optionally basic information concerning their manouvering capabilities.
+In order to facilitate flow management vessels in the area must broadcast their tactical voyageplan and optionally basic information concerning their manouvering capabilities.
 
 ===== Flow management suggestion
-A suggested change to an tactical voyageplan is called a _flow management suggestion_. A flow management suggestion can be transmitted from either a coordination centre or a peer vessel. It can take one of two principal forms:
+A suggested change to a tactical voyageplan is called a _flow management suggestion_. A flow management suggestion can be transmitted from either a coordination centre or a peer vessel. It can take one of two principal forms:
 
 1. Geometry-based (adding, deleting or changing waypoints)
 1. Speed-based (not changing any waypoints)
@@ -103,10 +103,6 @@ image::images/controlled_area.png[img-controlled-area, align="center"]
 
 === Scope of work
 The scope of the work in this paper is _controlled flow management in a limited area (in order of size as a VTS area) based on flow management suggestions in the speed-based form_.
-
-The objective is to define _which_ information (i.e. payload, data fields) that need to be exchanged and to define the criteria/triggers for _when_ this information is transmitted.
-
-The outcome is a set of message definitions, transmission criteria, test data, and a reference implementation to support controlled and autonomous flow management.
 
 [[use_cases]]
 == Use cases
@@ -321,13 +317,13 @@ This shall be achieved by supplying example datagrams together with a human-read
 == Design of flow management message types and conversations
 
 === High-level design
-In the high-level design of support for flow management no assumptions are made about the characteristics of the underlying transport layer. Focus here, is to identify which pieces of information need to be exchanged, between whom, and when. Following this are detailed specifications for mapping this outcome to real-world protocols, such as AIS <<AISSPEC5>>.
+In the high-level design of flow management messages no assumptions are made about the characteristics of the underlying transport layer. Focus here is to identify which pieces of information need to be exchanged, between whom, and when. Following this are detailed specifications mapping this outcome to specific protocols, such as AIS <<AISSPEC5>>.
 
 The messages to support flow management must have following characteristics:
 
 - The message payload should be related to the current tactical execution, the imminent future. I.e. the message should not be designed for planning purposes or announcement of future intentions.
 - The message should have carrying capability for as many waypoints as possible.
-- The message should optionally support ETA or SOG per waypoint and vessel's turn radius.
+- The message should optionally support ETA or SOG per waypoint and vessel's TCD.
 
 ==== Message types
 Based on the <<use_cases>> it is noted, that the following messages are involved in flow management:
@@ -342,7 +338,7 @@ The sugested payloads and transmission triggers of these message types are the f
 
 ===== Tactical voyageplan broadcast
 
-[cols="2,2,8"]
+[cols="4,2,8"]
 .Information payload of message type *tactical voyageplan broadcast*.
 |===
 | Data field | Type | Description
@@ -372,14 +368,14 @@ Retransmission is not applicable.
 
 ===== Tactical voyageplan inquiry
 
-[cols="2,2,8"]
+[cols="4,2,8"]
 .Information payload of message type *tactical voyageplan broadcast*.
 |===
 | Data field | Type | Description
 
 | Receiver | Required | Receiver identification
 | Sender | Required | Sender identification
-
+| Controlled area | Optional | Indication of controlled area inside which to routinely broadcast tactical voyageplan.
 |===
 
 The message can be transmitted by vessels or shore-based coordination centres.
@@ -400,17 +396,17 @@ The following transmission triggers apply:
 
 ===== Flow management suggestion
 
-[cols="2,2,8"]
+[cols="4,2,8"]
 .Information payload of message type *flow management suggestion*.
 |===
 | Data field | Type | Description
 
 | Sender | Required | Sender identification
 | Waypoints | Required | Positions of waypoints on the tactical voyageplan.
-| Active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
-| ETA active waypoint | Required | Suggested time of arrival at active waypoint.
-| ETA last waypoint | Required | Suggested time of arrival at last waypoint.
-| ETA other waypoints | Optional | Suggested time of arrival at respective waypoint.
+| Suggested active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
+| Suggested ETA of suggested active waypoint | Required | Suggested time of arrival at active waypoint.
+| Suggested ETA of suggested last waypoint | Required | Suggested time of arrival at last waypoint.
+| Suggested ETA of other suggested waypoints | Optional | Suggested time of arrival at respective waypoint.
 |===
 
 The message must only be transmitted by shore-based coordination centres. It can only be addressed to vessels following an active tactical voyageplan announced via the tactical voyageplan broadcast message.
@@ -421,15 +417,6 @@ The following transmission triggers apply:
 
 1. On need to suggest changes to tactical voyageplan to support flow management. E.g. if a coordination center determines, that better overall flow can be achieved by the receiving vessel:
 - changing ETA to announced waypoints.
-
-==== Use case scenarios
-
-Vessel A arrives at area.
-
-It has routinely broadcast message "tactical voyageplan" or "tactical voyageplan, extended"
-If not: The control center sends message "tactical voyageplan, inquiry"
-
-*TBD*
 
 === Detailed message design
 
@@ -513,16 +500,11 @@ Following the arguments above, the following AIS messages are suggested to be us
 |Message purpose |Message type |Defined by
 
 |Tactical voyageplan broadcast           | ASM DAC=219; FI=01 |<<ASM_219_01>> +
-See <<ais_message_definitions>>.
-|Tactical voyageplan broadcast, extended | ASM DAC=219; FI=02 |_To be defined_. +
-See <<ais_message_definitions>>.
-|Tactical voyageplan inquiry             | ASM DAC=001; FI=03 |_To be defined_ +
-See <<ais_message_definitions>>.
-|Flow management suggestion              | ASM DAC=219; FI=04 |_To be defined_ +
-See <<ais_message_definitions>>.
+Appendix: <<tactical_voyageplan_broadcast>>
+|Tactical voyageplan broadcast, extended | ASM DAC=219; FI=02 |Appendix: <<tactical_voyageplan_broadcast_extended>>.
+|Tactical voyageplan inquiry             | ASM DAC=001; FI=03 |Appendix: <<tactical_voyageplan_inquiry>>.
+|Flow management suggestion              | ASM DAC=219; FI=04 |Appendix: <<flow_management_suggestion>>.
 |===
-
-The suggested detailed definition of the three message types _to be defined_ are stated in the appendix: <<ais_message_definitions>>.
 
 [[design_validation]]
 == Validation against design criteria
@@ -581,8 +563,9 @@ The suggested detailed definition of the three message types _to be defined_ are
 
 The following AIS message definitions are proposed for flow management support.
 
-=== Tactical voyageplan broadcast
-Formally proposed specification copied from <<ASM_219_01>>.
+[[tactical_voyageplan_broadcast]]
+=== tactical voyageplan broadcast (defined)
+Formally proposed specification copied from <<ASM_219_01>>:
 
 ====
 
@@ -622,7 +605,7 @@ obo@frv.dk +
 Table 2.1 +
 Intended route (broadcast)
 
-[cols="4,2,12"]
+[cols="4,>2,12"]
 |===
 |Parameter |No. of bits |Description
 
@@ -662,7 +645,7 @@ Intended route (broadcast)
 
 Table 2.2 +
 Waypoints
-[cols="4,2,12"]
+[cols="4,>2,12"]
 |===
 |Parameter |No. of bits |Description
 
@@ -672,8 +655,8 @@ Waypoints
 
 ====
 
-=== Tactical voyageplan broadcast, extended
-Proposal:
+[[tactical_voyageplan_broadcast_extended]]
+=== Tactical voyageplan broadcast, extended (proposal)
 
 ====
 *Transmitter* +
@@ -780,8 +763,8 @@ Integer value; [0-255]. +
 
 ====
 
-=== Tactical voyageplan inquiry
-Proposal:
+[[tactical_voyageplan_inquiry]]
+=== Tactical voyageplan inquiry (proposal)
 
 ====
 
@@ -847,11 +830,8 @@ If the _flow managed_ area is included in the transmission, it is to be interpre
 |Inquiry with area | 198 | 2
 ====
 
-=== Flow management suggestion
-
-This message contains lat/longs - can later be used for route change suggestions.
-
-Proposal:
+[[flow_management_suggestion]]
+=== Flow management suggestion (proposal)
 
 ====
 
