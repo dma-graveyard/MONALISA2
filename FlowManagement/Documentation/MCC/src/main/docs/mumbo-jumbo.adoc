@@ -153,7 +153,7 @@ It is likely that much of the optional static information may be resolved by oth
 The Voyage Format specifies an arbitrary extension to the voyage plan. This allows vendors to provide explicit information inside a Voyage Plan for subsequent processing when exchanged with other vendor specific equipment.
 
 The Maritime Cloud does not provide the ability to provide neither inheritance or extension mechanisms for this sort of data. It may be valuable to consider this aspect.
- 
+
 == Publications
 
 * Garbebring, T. (2011). Passagen som aldrig sover: Ständig kontroll i sundet. In Sjörapporten, 7, 10-12. Norrköping: Sjöfartsverket.

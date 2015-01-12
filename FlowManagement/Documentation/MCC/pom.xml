@@ -12,6 +12,9 @@
       <!-- Adds a process-asciidoc goal to the generate-resources phase  -->
       <!-- compiling all documents in src/main/docs to target/docs/ -->
       <!-- ========================================================================= -->
+      <properties>
+        <backend>html5</backend>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -49,7 +52,7 @@
             <version>0.1.4</version>
             <executions>
               <execution>
-                <id>output-html</id>
+                <id>output-asciidoc</id>
                 <phase>generate-resources</phase>
                 <goals>
                   <goal>process-asciidoc</goal>
@@ -57,7 +60,7 @@
               </execution>
             </executions>
             <configuration>
-              <backend>html</backend>
+              <backend>${backend}</backend>
               <doctype>book</doctype>
               <sourceDirectory>${basedir}/src/main/docs</sourceDirectory>
               <imagesDir>./</imagesDir>
