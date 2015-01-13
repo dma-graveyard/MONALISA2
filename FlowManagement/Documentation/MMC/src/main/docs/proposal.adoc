@@ -4,6 +4,8 @@ v0.1, January 6, 2015: First draft
 :keywords: imo, iala, mms, dma, monalisa, maritime cloud
 :toc-placement: preamble
 :icons: font
+:servicedir: ../../../../../Services/
+:msdlfile: {servicedir}/src/main/msdl/eu/monalisaproject/flowmanagement.msdl
 
 Prepared by the http://dma.dk[Danish Maritime Authority] as part of the http://monalisaproject.eu/[MONA LISA 2] project.
 
@@ -95,7 +97,7 @@ As part of [[ARCH]] vessels are required to publish their Dynamic Voyage Plan to
 The coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages, so that it can maintain an updated real-time picture of the current traffic situation. 
 
 [[img-controlled-area]]
-.A controlled area and five vessels showing their intended routes. There are vessels outside (1, 2) and vessels inside (3-5) the controleld area. A vessel (2) is entering, a vessel is leaving (3), and two vessels are staying (4 ,5).
+.A controlled area and five vessels showing their intended routes. There are vessels outside (1, 2) and vessels inside (3-5) the controlled area. A vessel (2) is entering, a vessel is leaving (3), and two vessels are staying (4 ,5).
 image::images/controlled_area.png[img-controlled-area, align="center"]
 
 ==== Autonomous flow management
@@ -103,7 +105,7 @@ image::images/controlled_area.png[img-controlled-area, align="center"]
 
 ==== Maritime Cloud
 
-The Maritime Cloud [[MARCLOUD]] is defined as “A communication framework enabling efficient, secure, reliable and seamless electronic information exchange 
+The Maritime Cloud <<MARCLOUD>> is defined as “A communication framework enabling efficient, secure, reliable and seamless electronic information exchange 
 between all authorized maritime stakeholders across available communication systems” and contains
 
 . A Maritime Identify Registry
@@ -129,14 +131,14 @@ The objective is to define _which_ information (i.e. messages) that need to be e
 
 The outcome is a set of message definitions, endpoints, test data, and a reference implementation to support controlled flow management.
 
-The interaction is specified in [[ARCH]] chapter 10 - Core Services, and include all interaction between vessel and STCC using MMS.
+The interaction is specified in <<ARCH>> chapter 10 - Core Services, and include all interaction between vessel and STCC using MMS.
 
 [[use_cases]]
 == Use cases
 
 === Use cases for controlled flow management
 
-The use cases presented in this chapter are specified in [[ARCH]] chapter 10 - Core Services. Although the chapter contains other services, the use cases presented here
+The use cases presented in this chapter are specified in <<ARCH>> chapter 10 - Core Services. Although the chapter contains other services, the use cases presented here
 are all made available through MMS.
 
 ==== Use case: Requesting a tactical voyage plan
@@ -178,22 +180,48 @@ The request specifies the time interval of the tactical voyage plan as a configu
 
 Communication in MMS is specified through endpoint and broadcasts. In order to support the use cases, there is currently no particular need for broadcast, so this chapter outlines the endpoint definitions as well as the message formats.
 
-Details of the service definitions is described in the Maritime Cloud Developer Guide, which is published online [[[MARCLOUDDEV]]].
+Details of the service definitions is described in the Maritime Cloud Developer Guide, which is published online [[MARCLOUDDEV]].
 
 === STCC endpoint
 
-==== Response to flow management suggestion
+==== Tactical Voyage Plan Exchange
 
-endpoint FlowManagementSuggestionEndpoint {
+Two endpoint methods are defined in an exchange of a tactical voyage plan.
+One endpoint method for requesting a tactical voyage plan and one endpoint for the response.
 
-   void flowManagementSuggestionResponse(
-     1: int64 id;
-   );
-   
-   void flowManagementSuggestion(
-     1: int64 id;
-   );
-}
+Such a response may be generated automatically and synchronous, however allowing the response to be sent asynchronously allow the OOW to decide on the best course of
+action for the request.
+
+[source]
+----
+include::{msdlfile}[tags=tvpendpoint]
+----
+
+The nature of the asynchronous endpoints allow an exchange of a tactical voyage plan from ship to ship as well as ship to shore. 
+
+// Provide an illustration?
+
+In a single ship to shore scenario the ship is expected to implement the behaviour behind a request method and the shore is expected to implement the behaviour behind the response method. 
+
+In a ship to ship scenario ships can request a tactical voyage plan from other ships and would need to implement the reponse method as well.
+
+A shore station cannot logically emit tactical voyage plan and may ignore a request or simply provide an empty response.
+
+
+
+==== Flow Management Suggestion Exchange
+
+Two endpoint methods are defined for flow management suggestions. One method for posting the suggestion and another endpoint method for the response.
+
+[source]
+----
+include::{msdlfile}[tags=flowendpoint]
+----
+
+The asynchronous nature of the conversation allows the vessel to verify the suggestion before deciding upon further action. 
+
+Similar to the tactical voyage plan exchange the interaction can be ship to ship and ship to shore. The ship to ship scenario would enable Autonomous flow management.
+
 
 
 [glossary]

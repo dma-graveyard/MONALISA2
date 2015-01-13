@@ -1,19 +1,73 @@
 namespace eu.monalisaproject;
 
 
-message TacticalVoyagePlanRequest {
-	/* Conversation ID of the request. Must be used for response */
+message FlowManagementSuggestionRequest {
+	/* 
+	  Conversation ID of the request. 
+	  A unique identifier which must be used in the response message.
+	 */
 	1: int64 requestId;
-};
+}
 
-message TacticalVoyagePlanResponse {
-	/* Conversation ID of the request. 
-	   ID of the request to which we are responding 
+message FlowManagementSuggestionResponse {
+	/* 
+	  Conversation ID of the request. 
+	  ID of the request to which we are responding.
 	*/
 	1: int64 requestId;
+}
+
+message TacticalVoyagePlanRequest {
+	/* 
+	  Conversation ID of the request. 
+	  A unique identifier which must be used in the response message.
+	 */
+	1: int64 requestId;
+	
+	/*
+	  Specify the time window of the request.
+	  Specifies the amount of time in minutes to include in the response.
+	  A zero or negative number may result in an error response or no response.
+	*/
+	2: int timeWindow;
+};
+
+enum ExchangeResponseType {
+	NO_DISCLOSURE = 1;            // will not disclose the tvp
+	NO_TACTICAL_VOYAGE_PLAN = 2;  // have no tvp (berth,anchor)
+	REJECTED = 3;                 // other circumstance (see text)
+	PROVIDED = 4;	              // tvp attached to the message
+}
+
+message TacticalVoyagePlanResponse {
+	/* 
+	  Conversation ID of the request. 
+	  ID of the request to which we are responding.
+	*/
+	1: int64 requestId;
+	
+	/* Which type of response to the request. */
+	2: ExchangeResponseType responseType;
+	
+	/* Explanation for rejections */
+	3: text textMessage;
 };
 
 
+/**
+  The tactical voyage plan endpoint.
+
+  The tactical voyage plan endpoint allow the request/response of a tactical voyage plan 
+  between entities.
+
+  A tactical voyage plan is a subset of the Dynamic Voyage Plan for the near future.
+
+  A tactical voyage plan is typically requested by an STCC as part of a coordination effort 
+  between multiple vessel, such as in flow management scenarios.
+
+  
+*/
+// tag::tvpendpoint[]
 endpoint TacticalVoyagePlanEndpoint {
 	
 	void requestTacticalVoyagePlan(
@@ -26,14 +80,31 @@ endpoint TacticalVoyagePlanEndpoint {
 	
 	
 }
+// end::tvpendpoint[]
 
+/**
+  The flow management endpoint.
+
+  The flow management endpoint allow the request/response of a flow management suggestion 
+  between entities. 
+
+  A flow management suggestion is typically sent from STCC to vessels that need to adapt
+  their current schedule to optimize the flow of narrow channels. However, a suggestion 
+  can potentially be exchanged between two vessels in an autonomous scenario or by any
+  AtoN equipment.
+
+  
+*/
+// tag::flowendpoint[]
 endpoint FlowManagementSuggestionEndpoint {
 
+   void flowManagementSuggestion(
+     1: FlowManagementSuggestionRequest request
+   );
+
    void flowManagementSuggestionResponse(
-     1: int64 id
+     1: FlowManagementSuggestionResponse response
    );
    
-   void flowManagementSuggestion(
-     1: int64 id
-   );
 }
+// end::flowendpoint[]

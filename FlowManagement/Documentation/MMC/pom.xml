@@ -6,7 +6,7 @@
   <groupId>dk.dma.monalisa2</groupId>
   <artifactId>flowmanagement-msdl</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
       <!-- ========================================================================= -->
       <!-- Adds a process-asciidoc goal to the generate-resources phase  -->
@@ -71,6 +71,24 @@
               </attributes>
             </configuration>
           </plugin>
+          <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-docs-distribution</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assembly/docs.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
         </plugins>
       </build>
 
