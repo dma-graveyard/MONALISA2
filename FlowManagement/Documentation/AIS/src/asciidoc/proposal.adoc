@@ -13,7 +13,7 @@ image::images/eu.png[align="center"]
 
 [cols="1,2,4,4"]
 |===
-|v0.0 |06 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |First draft.
+|v0.0 |12 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |First draft.
 |===
 
 [abstract]
@@ -323,7 +323,7 @@ The messages to support flow management must have following characteristics:
 
 - The message payload should be related to the current tactical execution, the imminent future. I.e. the message should not be designed for planning purposes or announcement of future intentions.
 - The message should have carrying capability for as many waypoints as possible.
-- The message should optionally support ETA or SOG per waypoint and vessel's TCD.
+- The message should optionally support ETA or SOG per waypoint and vessel's TR.
 
 ==== Message types
 Based on the <<use_cases>> it is noted, that the following messages are involved in flow management:
@@ -347,7 +347,7 @@ The sugested payloads and transmission triggers of these message types are the f
 | Activation indicator | Required | Indication of whether the vessel cancels/deactives its voyageplan or whether it actively follows it.
 | Waypoints | Required | Positions of waypoints on the tactical voyageplan.
 | Active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
-| TCD | Optional | Ship's turning radius in the current area (read more in <<definitions>>).
+| TR | Optional | Ship's turning circle radius in the current area (read more in <<definitions>>).
 | ETA active waypoint | Required | Estimated time of arrival at active waypoint.
 | ETA last waypoint | Required | Estimated time of arrival at last waypoint.
 | ETA other waypoints | Optional | Estimated time of arrival at respective waypoint.
@@ -695,10 +695,10 @@ Waypoints are denoted WP~_0_~, WP~_1_~, WP~_i_~,..., WP~_n_~ and are navigated i
 |Spare |1 |Not used. Set to zero.
 |IAI |16 |*DAC = 219; FI = 4*
 3+^.^|_Message may end here to indicate cancellation of previously announced tactical voyageplan._|
-TCD |7 |Turn cicle diameter. +
+TR |7 |Turn circle radius. +
 Type: Integer. Unit: 1/100 of a nautical mile. +
 0 = no value +
-1 - 127 = turn circle diameter of 0.01 nm - 1.27nm
+1 - 127 = turn circle radius of 0.01 nm - 1.27nm
 .2+|ETA of WP~0~ |5 |UTC hour +
 Integer value +
 Values outside the range 0-23 are illegal and must not be used. +
@@ -937,7 +937,7 @@ Integer value; [0-255]. +
 |Strategic voyageplan | MONALISA 2 term for long term planning that consists of a route with a voyage number (and other Route information), a list of waypoints (geometry), a schedule, charter parties, legal conditions, and more. When a Strategic voyage plan is given to the ship as a voyage order it changes to _dynamic voyageplan_.
 |Dynamic voyageplan | MONALISA 2 term for an optimised version of the _strategic voyageplan_
 |Tactical voyageplan | MONALISA 3 term for a dynamic voyageplan in conning mode; i.e. under tactical execution. Whole or parts of the tactical voyage plan can be transmitted to increase situational awareness and support flow management.
-|Turning circle diameter | Merchant ships usually turn in a circle having a diameter of about 3–4 times the length between perpendiculars. TCD varies little with speed, but can vary significantly between manouvers in deep and shallow waters. TCD depends on the size and geometry of a vessel, the size of its rudder, and the no. and characteristics of propellers. Cf. <<SBTCD>> for more.
+|Turn circle radius | Merchant ships usually turn in a circle having a radius of about 6–8 times the length between perpendiculars. Turn radius varies little with speed, but can vary significantly between manouvers in deep and shallow waters. The radius depends on the size and geometry of a vessel, the size of its rudder, and the no. and characteristics of propellers. Cf. <<SBTCD>> for more.
 |===
 
 === Abbreviations
@@ -958,7 +958,7 @@ Integer value; [0-255]. +
 |ASCII |American Standard Code for Interformation Interchange | A character encoding scheme used in computers, communications equipment, and other devices that use text, to represent text with numbers.
 |ETA |Estimated time of arrival |-
 |SOG |Speed over ground |Speed made good (often measured in knots).
-|TCD |Turning circle diameter| Turning circle diameter (often measured in nautical miles).
+|TR |Turning circle radius| Turning circle radius (often measured in nautical miles).
 |===
 
 [bibliography]
