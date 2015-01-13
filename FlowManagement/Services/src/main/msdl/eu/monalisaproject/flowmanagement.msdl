@@ -1,0 +1,39 @@
+namespace eu.monalisaproject;
+
+
+message TacticalVoyagePlanRequest {
+	/* Conversation ID of the request. Must be used for response */
+	1: int64 requestId;
+};
+
+message TacticalVoyagePlanResponse {
+	/* Conversation ID of the request. 
+	   ID of the request to which we are responding 
+	*/
+	1: int64 requestId;
+};
+
+
+endpoint TacticalVoyagePlanEndpoint {
+	
+	void requestTacticalVoyagePlan(
+		1: TacticalVoyagePlanRequest request
+	);
+	
+	void respondTacticalVoyagePlan(
+		1: TacticalVoyagePlanResponse response
+	);
+	
+	
+}
+
+endpoint FlowManagementSuggestionEndpoint {
+
+   void flowManagementSuggestionResponse(
+     1: int64 id
+   );
+   
+   void flowManagementSuggestion(
+     1: int64 id
+   );
+}

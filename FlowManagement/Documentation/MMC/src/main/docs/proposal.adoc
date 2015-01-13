@@ -111,7 +111,7 @@ between all authorized maritime stakeholders across available communication syst
 . A Maritime Messaging Service (MMS)
 
 [[img-mar-cloud]]
-.The Maritime Cloud enable vessels and stakeholders to provide services in a secure exchange
+.The Maritime Messaging Service enable vessels and stakeholders to provide services in a secure exchange
 image::images/maritimecloud.png[img-mar-cloud, align="center"]
 
 Vessels, STCC and other stakeholders may enable a service by providing an _endpoint_ which can be queried. Requests may be initiated from any stakeholder by invocation of the _endpoint_.
@@ -123,50 +123,36 @@ Service endpoints and broadcast messages are described in a specific Maritime Se
 
 
 === Scope of work
-The scope of the work in this paper is _controlled flow management in a limited area (in order of size as a VTS area) based on flow management suggestions using maritime cloud services_.
+The scope of the work in this paper is _controlled flow management in a limited area (managed by an STCC) based on flow management suggestions using maritime cloud services_.
 
 The objective is to define _which_ information (i.e. messages) that need to be exchanged and to define the criteria/triggers for _when_ this information is transmitted.
 
 The outcome is a set of message definitions, endpoints, test data, and a reference implementation to support controlled flow management.
+
+The interaction is specified in [[ARCH]] chapter 10 - Core Services, and include all interaction between vessel and STCC using MMS.
 
 [[use_cases]]
 == Use cases
 
 === Use cases for controlled flow management
 
-==== Use case: Vessel approaches the controlled area
+The use cases presented in this chapter are specified in [[ARCH]] chapter 10 - Core Services. Although the chapter contains other services, the use cases presented here
+are all made available through MMS.
+
+==== Use case: Requesting a tactical voyage plan
+
 
 {set:step:0}
 [cols="1,5"]
 .Use case.
 |===
-| {counter:step} | The coordination centre detects that a vessel approaches or has already entered the controlled area.
-| {counter:step} | The coordination centre request the intension from the vessel with regards to the controlled area.
-| {counter:step} | The vessel responds with a status indicating its intension.
-| {counter:step} | The coordination centre may choose to include or exclude the vessel for flow management.
-| *Exception*    | Requestor may not be a coordination centre.
-|===
-
-==== Use case: Vessel receives request for tactical voyage plan
-
-{set:step:0}
-[cols="1,5"]
-.Use case.
-|===
+| {counter:step} | The STCC detects that a vessel approaches or has already entered the controlled area.
 | {counter:step} | The vessel receives a request for a tactical voyage plan.
+The request specifies the time interval of the tactical voyage plan as a configurable time window (Default five hours).
 | {counter:step} | The vessel check that it wish to communicate the tactical voyage plan with the requestor.
 | {counter:step} | The vessel responds with a tactical voyage plan.
-| *Exception*    | Requestor may not be a coordination centre or nearby vessel.
+| *Exception*    | Requestor may not be a coordination centre. Vessel may choose not to disclose the tactical voyage plan.
 | *Exception*    | The vessel may not have a tactical voyage plan at present.
-|===
-
-==== Use case: Vessel broadcast a tactical voyage plan
-
-{set:step:0}
-[cols="1,5"]
-|===
-| {counter:step} | The vessel transmit a tactical voyage plan.
-| {counter:step} | The vessel may decide to broadcast at regular intervals.
 |===
 
 ==== Use case: Vessel receive flow management suggestion
@@ -174,11 +160,40 @@ The outcome is a set of message definitions, endpoints, test data, and a referen
 {set:step:0}
 [cols="1,5"]
 |===
-| {counter:step} | The vessel receive a flow management suggestion
-| {counter:step} | The vessel acknowledge the receipt of the suggestion
-| {counter:step} | The vessel accepts or rejects the suggestion
-| *Exception* | The vessel do not respond to the flow management suggestion
+| {counter:step} | The vessel receive a flow management suggestion from the coordination centre.
+| {counter:step} | The vessel acknowledge the receipt of the suggestion.
+| {counter:step} | The officer on watch (OOW) verify the proposal.
+.4+| {counter:step} | If the vessel accepts the proposal:
+                 | -- The vessel update the dynamic voyage plan if needed. Any changes to the route or schedule will result in an update being sent to the STCC.
+				 | -- The vessel respond with approval message.
+				 | -- The vessel starts broadcasting new tactical voyage plan via AIS.
+.2+| {counter:step} | If the vessel does not accept the proposal:
+                    | -- The vessel respond with a rejection message.				 
+| *Exception* | The vessel do not respond to the flow management suggestion.
 |===
+
+
+[[messageformat]]
+== Message and Endpoint definitions
+
+Communication in MMS is specified through endpoint and broadcasts. In order to support the use cases, there is currently no particular need for broadcast, so this chapter outlines the endpoint definitions as well as the message formats.
+
+Details of the service definitions is described in the Maritime Cloud Developer Guide, which is published online [[[MARCLOUDDEV]]].
+
+=== STCC endpoint
+
+==== Response to flow management suggestion
+
+endpoint FlowManagementSuggestionEndpoint {
+
+   void flowManagementSuggestionResponse(
+     1: int64 id;
+   );
+   
+   void flowManagementSuggestion(
+     1: int64 id;
+   );
+}
 
 
 [glossary]
@@ -213,6 +228,7 @@ The outcome is a set of message definitions, endpoints, test data, and a referen
 |ETA |Estimated time of arrival |-
 |ETC |Estimated time of departure |-
 |SOG |Speed over ground |Speed made good measured in knots.
+|OOW |Officer on watch |-
 |===
 
 [bibliography]
@@ -229,4 +245,6 @@ The outcome is a set of message definitions, endpoints, test data, and a referen
 [[[MONALISA2]]] "MONALISA 2.0". A joint project from 10 different countries in the European Union to introduce Sea Traffic Management (STM) and make real-time information available to all interested and authorised parties in the maritime world. http://monalisaproject.eu/.
 
 
-[[[MARCLOUD]]] Marimtime Cloud. A framework consisting of standards, infrastructure and governance that fascilitate secure interoperable information exchange between stakeholders in the maritime community using the principles of Service Oriented Architectures. http://www.maritimecloud.net/.
+[[[MARCLOUD]]] Maritime Cloud. A framework consisting of standards, infrastructure and governance that fascilitate secure interoperable information exchange between stakeholders in the maritime community using the principles of Service Oriented Architectures. http://www.maritimecloud.net/.
+
+[[[MARCLOUDDEV]]] Marimtime Cloud Developer Guide. A guide for developers using the maritime cloud. Also includes a section on current MSDL. http://dev.maritimecloud.net/devguide/index.html#mms-and-services.
