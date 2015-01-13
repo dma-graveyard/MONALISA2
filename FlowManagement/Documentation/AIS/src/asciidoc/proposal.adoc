@@ -57,22 +57,22 @@ As defined by <<ARCH>> flow management is communication which takes place betwee
 1. Support vessel in arriving at final destination in due time as efficient as possible.
 1. Provide information to interested parties about planned and predicted time of arrival to final destination or other point of interest.
 
-For item 1 the term "good" means that collisions and dangerous situations are avoided and that vessels can safely follow their announced tactical voyageplan through the area.
+For item 1 the term "good" means that collisions and dangerous situations are avoided and that vessels can safely follow their announced tactical voyage plan through the area.
 
-Flow _management_ is based on knowledge of vessels' tactical voyageplans; i.e. announcements from each vessel regarding their intended manouvers in the immediate short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for the coordination centre or the nearby vessels to suggest tactical voyageplans to a vessel with the purpose of obtaining a "good" overall flow. This process is called _flow management_.
+Flow _management_ is based on knowledge of vessels' tactical voyage plans; i.e. announcements from each vessel regarding their intended manouvers in the immediate short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for the coordination centre or the nearby vessels to suggest tactical voyage plans to a vessel with the purpose of obtaining a "good" overall flow. This process is called _flow management_.
 
-If flow management takes place in a self-organizaing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- all vessels can safely and efficiently follow their tactical voyageplans through their entire passage of the area.
+If flow management takes place in a self-organizaing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- all vessels can safely and efficiently follow their tactical voyage plans through their entire passage of the area.
 
-===== Tactical voyageplan
-In order to facilitate flow management vessels in the area must broadcast their tactical voyageplan and optionally basic information concerning their manouvering capabilities.
+===== Tactical voyage plan
+In order to facilitate flow management vessels in the area must broadcast their tactical voyage plan and optionally basic information concerning their manouvering capabilities.
 
 ===== Flow management suggestion
-A suggested change to a tactical voyageplan is called a _flow management suggestion_. A flow management suggestion can be transmitted from either a coordination centre or a peer vessel. It can take one of two principal forms:
+A suggested change to a tactical voyage plan is called a _flow management suggestion_. A flow management suggestion can be transmitted from either a coordination centre or a peer vessel. It can take one of two principal forms:
 
 1. Geometry-based (adding, deleting or changing waypoints)
 1. Speed-based (not changing any waypoints)
 
-Changing the geometry of an tactical voyageplan is a relatively complex operation for the vessel's navigator. Among other things the process involves a safety check of the new route and reprogramming of navigational equipment. The cost/workload of this operation reduces the likelihood of a vessel complying with suggested changes.
+Changing the geometry of an tactical voyage plan is a relatively complex operation for the vessel's navigator. Among other things the process involves a safety check of the new route and reprogramming of navigational equipment. The cost/workload of this operation reduces the likelihood of a vessel complying with suggested changes.
 
 Changing the vessel's speed (or waypoint ETA's) is a far simpler operation for the navigator. This involves only adjustment of the vessel's speed and recalculation of the wheel-over-point in advance of each waypoint. It is therefore expected, that the likelihood of a of vessel complying with a suggested change of this type is higher than suggested changes to geometry.
 
@@ -90,7 +90,7 @@ Vessels inside the controlled area can be in states
 - _leaving_ -- meaning that the vessel intends to leave the controlled area.
 - _staying_ -- meaning that the vessel intends to seek berth, drop anchor, or elsehow keep manouvering inside the area.
 
-Some of the vessels are aware of some of the other vessels' tactical voyageplans, and the coordination centre is aware of some of the vessel's tactical voyageplans.
+Some of the vessels are aware of some of the other vessels' tactical voyage plans, and the coordination centre is aware of some of the vessel's tactical voyage plans.
 
 The coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages, so that it can maintain an updated real-time picture of the current traffic situation.
 
@@ -115,17 +115,17 @@ The scope of the work in this paper is _controlled flow management in a limited 
 |===
 | No. | Event | Action
 
-| {counter:step} | The coordination centre detects, that a vessel has entered the controlled area. | The control centre transmits an addressed message to the vessel requesting it broadcast tactical voyageplans.footnote:[This is done even if the coordination centre already has this information in order to distribute this information to other vessels in the area.]
-| {counter:step} | The vessel receives the message. | The vessel responds by broadcasting message, which contains its tactical voyageplans.
-.2+| {counter:step} | The broadcast is received by the coordination centre (and likely some of the other vessels in the area). | The control centre recalculates optimal speeds per vessel.footnote:[with priority to suggest speed changes for V~0~ over other vessels, and fewest possible other vessels, and only for vessels intending to leave A.]
-| *Exception:* The broadcast is never received by the coordination centre. | The coordination centre retransmits its message to the vessel.
-| {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
-.2+| {counter:step} | A vessel receives its flow management suggestion  from the coordination centre. | The navigator is alerted.
+| {counter:step} | The STCC detects, that a vessel has entered the controlled area. | The STCC transmits an addressed message to the vessel requesting it broadcast tactical voyage plans.footnote:[This is done even if the STCC already has this information in order to distribute this information to other vessels in the area.]
+| {counter:step} | The vessel receives the message. | The vessel responds by broadcasting message, which contains its tactical voyage plans.
+.2+| {counter:step} | The broadcast is received by the STCC (and likely some of the other vessels in the area). | The control centre recalculates optimal speeds per vessel.footnote:[with priority to suggest speed changes for V~0~ over other vessels, and fewest possible other vessels, and only for vessels intending to leave A.]
+| *Exception:* The broadcast is never received by the STCC. | The STCC retransmits its message to the vessel.
+| {counter:step} | The STCC's recalculation of optimal speeds completes. | The STCC transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
+.2+| {counter:step} | A vessel receives its flow management suggestion  from the STCC. | The navigator is alerted.
 | *Exception:* The flow management suggestion is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
-| {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
+| {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyage plan.
 |===
 
-=== Use case: Coordination centre determintes new flow management suggestion s needed
+=== Use case: STCC determintes new flow management suggestion is needed
 
 {set:step:0}
 [cols="1,5,5"]
@@ -133,25 +133,25 @@ The scope of the work in this paper is _controlled flow management in a limited 
 |===
 | No. | Event | Action
 
-| {counter:step} | The coordination centre detects that the current flow is not optimal ("good") | The control centre recalculates optimal speeds per vessel.
-| {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
-.2+| {counter:step} | A vessel receives its flow management suggestion  from the coordination centre. | The navigator is alerted.
+| {counter:step} | The STCC detects that the current flow is not optimal ("good") | The STCC recalculates optimal speeds per vessel.
+| {counter:step} | The STCC's recalculation of optimal speeds completes. | The STCC transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
+.2+| {counter:step} | A vessel receives its flow management suggestion  from the STCC. | The navigator is alerted.
 | *Exception:* The flow management suggestion is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
-| {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
+| {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyage plan.
 |===
 
-=== Use case: Vessel broadcasts its tactical voyageplan
+=== Use case: Vessel broadcasts its tactical voyage plan
 
-=== Use case: Vessel changes or resends its tactical voyageplan
+=== Use case: Vessel changes or resends its tactical voyage plan
 
-=== Use case: Vessel cancels its tactical voyageplan
+=== Use case: Vessel cancels its tactical voyage plan
 
-=== Use case: A tactical voyageplan expires
+=== Use case: A tactical voyage plan expires
 
-=== Use case: A vessel suggests tactical voyageplan for another vessel
+=== Use case: A vessel suggests tactical voyage plan for another vessel
 (in a controlled flow management scenario)
 
-=== Use case: Receivers of a vessel's tactical voyageplan have different versions
+=== Use case: Receivers of a vessel's tactical voyage plan have different versions
 (in case of e.g. transmission ok, reception bad).
 
 == Design criteria
@@ -328,24 +328,24 @@ The messages to support flow management must have following characteristics:
 ==== Message types
 Based on the <<use_cases>> it is noted, that the following messages are involved in flow management:
 
-- *tactical voyageplan broadcast*. For a vessel to broadcast its tactical voyageplans.
-- *tactical voyageplan inquiry*. An addressed message transmitted by coordination centers and vessels to inquire a vessel about its tactical voyageplan.
-- *flow management suggestion*. An addressed message transmitted by coordination centers and vessels to suggest changes to a vessel's announced tactical voyageplan.
+- *tactical voyage plan broadcast*. For a vessel to broadcast its tactical voyage plans.
+- *tactical voyage plan inquiry*. An addressed message transmitted by coordination centers and vessels to inquire a vessel about its tactical voyage plan.
+- *flow management suggestion*. An addressed message transmitted by coordination centers and vessels to suggest changes to a vessel's announced tactical voyage plan.
 
 ==== Payloads and transmission triggers
 
 The sugested payloads and transmission triggers of these message types are the following.
 
-===== Tactical voyageplan broadcast
+===== Tactical voyage plan broadcast
 
 [cols="4,2,8"]
-.Information payload of message type *tactical voyageplan broadcast*.
+.Information payload of message type *tactical voyage plan broadcast*.
 |===
 | Data field | Type | Description
 
 | Sender | Required | Sender identification
-| Activation indicator | Required | Indication of whether the vessel cancels/deactives its voyageplan or whether it actively follows it.
-| Waypoints | Required | Positions of waypoints on the tactical voyageplan.
+| Activation indicator | Required | Indication of whether the vessel cancels/deactives its voyage plan or whether it actively follows it.
+| Waypoints | Required | Positions of waypoints on the tactical voyage plan.
 | Active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
 | TR | Optional | Ship's turning circle radius in the current area (read more in <<definitions>>).
 | ETA active waypoint | Required | Estimated time of arrival at active waypoint.
@@ -355,44 +355,44 @@ The sugested payloads and transmission triggers of these message types are the f
 
 The message must only be transmitted by vessels.
 
-The message is only transmitted if vessel is conned along an active voyageplan. In that case, the following transmission triggers apply:
+The message is only transmitted if vessel is conned along an active voyage plan. In that case, the following transmission triggers apply:
 
 1. Periodically.footnote:[Using AIS: Every six minutes (due to what is stated in <<AISSPEC5>> (§4.2.1) regarding sending interval for voyage related information]
 1. On voyage plan activation.
 1. On voyage plan change (change to waypoints or ETA at waypoints).
 1. On voyage plan deactivation/cancellation.
 1. On change of active waypoint.
-1. As reply to message "tactical voyageplan inquiry".
+1. As reply to message "tactical voyage plan inquiry".
 
 Retransmission is not applicable.
 
-===== Tactical voyageplan inquiry
+===== Tactical voyage plan inquiry
 
 [cols="4,2,8"]
-.Information payload of message type *tactical voyageplan broadcast*.
+.Information payload of message type *tactical voyage plan broadcast*.
 |===
 | Data field | Type | Description
 
 | Receiver | Required | Receiver identification
 | Sender | Required | Sender identification
-| Controlled area | Optional | Indication of controlled area inside which to routinely broadcast tactical voyageplan.
+| Controlled area | Optional | Indication of controlled area inside which to routinely broadcast tactical voyage plan.
 |===
 
-The message can be transmitted by vessels or shore-based coordination centres.
+The message can be transmitted by vessels or shore-based STCCs.
 
 Retransmission is not applicable.
 
 The following transmission triggers apply:
 
-1. On need by control centre to receive tactical voyageplan from a vessel. In case of e.g.:
+1. On need by control centre to receive tactical voyage plan from a vessel. In case of e.g.:
 - Vessel's arrival to controlled area.
-- Previously announced tactical voyageplan is invalid (e.g. expired, or vessel's manouvers deviate significantly from it).
+- Previously announced tactical voyage plan is invalid (e.g. expired, or vessel's manouvers deviate significantly from it).
 - Loss of data in control center.
-1. On need by vessel to receive tactical voyageplan from another vessel.
+1. On need by vessel to receive tactical voyage plan from another vessel.
 - The inquired vessel's intentions are unknown to the inquirying vessel; e.g. in case of
-* Tactical voyageplan was never transmitted by inquired vessel.
-* Tactical voyageplan was never received by inquirying vessel.
-* Information about another vessel's tactical voyageplan was lost onboard the inquirying vessel (e.g. due to system restart or improper operation).
+* Tactical voyage plan was never transmitted by inquired vessel.
+* Tactical voyage plan was never received by inquirying vessel.
+* Information about another vessel's tactical voyage plan was lost onboard the inquirying vessel (e.g. due to system restart or improper operation).
 
 ===== Flow management suggestion
 
@@ -402,20 +402,20 @@ The following transmission triggers apply:
 | Data field | Type | Description
 
 | Sender | Required | Sender identification
-| Waypoints | Required | Positions of waypoints on the tactical voyageplan.
+| Waypoints | Required | Positions of waypoints on the tactical voyage plan.
 | Suggested active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
 | Suggested ETA of suggested active waypoint | Required | Suggested time of arrival at active waypoint.
 | Suggested ETA of suggested last waypoint | Required | Suggested time of arrival at last waypoint.
 | Suggested ETA of other suggested waypoints | Optional | Suggested time of arrival at respective waypoint.
 |===
 
-The message must only be transmitted by shore-based coordination centres. It can only be addressed to vessels following an active tactical voyageplan announced via the tactical voyageplan broadcast message.
+The message must only be transmitted by shore-based STCCs. It can only be addressed to vessels following an active tactical voyage plan announced via the tactical voyage plan broadcast message.
 
 Retransmission is not applicable.
 
 The following transmission triggers apply:
 
-1. On need to suggest changes to tactical voyageplan to support flow management. E.g. if a coordination center determines, that better overall flow can be achieved by the receiving vessel:
+1. On need to suggest changes to tactical voyage plan to support flow management. E.g. if a coordination center determines, that better overall flow can be achieved by the receiving vessel:
 - changing ETA to announced waypoints.
 
 === Detailed message design
@@ -429,7 +429,7 @@ The following transmission triggers apply:
 ==== AIS
 
 ===== Existing ASMs
-A search in <<ASMCOLL>> reveals to candidate ASM's worth considering for the "tactical voyageplan" broadcast:
+A search in <<ASMCOLL>> reveals to candidate ASM's worth considering for the "tactical voyage plan" broadcast:
 
 |===
 |Title |Msg |DAC |FI |SU |Status |Registrant |Spec
@@ -452,12 +452,12 @@ Review of the application specific message DAC=001; FI=27 defined by <<ASM_001_2
 
 1. <<ASM_001_27>> specifies that "_13.1 This message ... should only be used in when important route information ... – not already provided by current official nautical charts or publications – needs to be relayed by authorities or vessels_". +
 +
-It is unclear whether a tactical voyageplan (in MONALISA terms) is "important route information". Certainly tactical voyageplans are not normally on any charts or publications; but are they "important" in the context of this message type?
+It is unclear whether a tactical voyage plan (in MONALISA terms) is "important route information". Certainly tactical voyage plans are not normally on any charts or publications; but are they "important" in the context of this message type?
 1. <<ASM_001_27>> specifies that "_13.4 In order to allow advance notice, this message should be transmitted prior to the start date and time specified for the routing information. It should not be transmitted more than one day in advance_". +
 +
 The statement that the message should not "should not be transmitted more than one day in advance" indicates that this message is for planning purposes, and not related to the imminent tactical situation.
 1. In the message layout <<ASM_001_27>> there is a field called "sender classification" which can only take one legal value: "1 = authority". Values 2-7 are reserved for future use. The value 0 is not defined in the specification, but since §13.1 indicates that the message can be used by vessels, perhaps 0 means that the sender is a vessel. But this is unclear.
-1. The data field "duration" occupies 18 bits and thus supports a max. value of 262142 minutes (using 262143 to indicate value not available) <<ASM_001_27>>. 262142 minutes equals 4.369 hours or 182 days. This is far beyong the needs for a tactical voyageplan and is therefore not efficient bit-usage for this purpose.
+1. The data field "duration" occupies 18 bits and thus supports a max. value of 262142 minutes (using 262143 to indicate value not available) <<ASM_001_27>>. 262142 minutes equals 4.369 hours or 182 days. This is far beyong the needs for a tactical voyage plan and is therefore not efficient bit-usage for this purpose.
 1. In <<ASM_001_27>> the data field "number of waypoints" is redundant with message length and thus violates the design criteria <<single_point_of_truth>>. Since the specification states that "The number of waypoints is determined by the length of the message." the presence of this field is a mystery. 5 bits could be saved.
 1. The message does not support individual ETA or turn radius per waypoint or SOG between waypoints.
 
@@ -471,14 +471,14 @@ Review of the application specific message DAC=219; FI=01 defined by <<ASM_219_0
 
 1. It is well-defined _when_ this message must be sent.
 1. First waypoint is always active waypoint - thus the message only carries future intentions.
-1. The data field "ETA active WP" can be set one year ahead. The good thing about this, is that it complies with the <<minimum_datatypes>> design criteria; but the bad thing is that it wastes bits; since the lifespan of a tactical voyageplan can probably be expressed in the order of hundres of minutes correponding to 10 bits of information.
+1. The data field "ETA active WP" can be set one year ahead. The good thing about this, is that it complies with the <<minimum_datatypes>> design criteria; but the bad thing is that it wastes bits; since the lifespan of a tactical voyage plan can probably be expressed in the order of hundres of minutes correponding to 10 bits of information.
 1. In <<ASM_219_01>> the data field "number of waypoints" is redundant with message length and thus violates the design criteria <<single_point_of_truth>>. It is unclear whether message length or data field "number of waypoints" determines the no. of waypoint. In either case, the bits used for the data field "number of waypoints" could be saved.
 1. The message does not support individual ETA or turn radius per waypoint or SOG between waypoints.
 
-In conclusion, DAC=219; FI=01 has some of the same discrepancies as DAC=001; FI=27, but the events which trigger transmission are more well-defined, it is clear that this message is transmitted by vessels (not shore stations); and it is clear that this message intended for communicating immediate navigation intentions in the same way as required for tactical voyageplans.
+In conclusion, DAC=219; FI=01 has some of the same discrepancies as DAC=001; FI=27, but the events which trigger transmission are more well-defined, it is clear that this message is transmitted by vessels (not shore stations); and it is clear that this message intended for communicating immediate navigation intentions in the same way as required for tactical voyage plans.
 
 Therefore it is recommended
-- to use DAC=219; FI=01 as a means for vessels to broadcast their tactical voyageplans flow management.
+- to use DAC=219; FI=01 as a means for vessels to broadcast their tactical voyage plans flow management.
 - to suggest one new message, with the same purpose as DAC=219; FI=01, but with the extended capability of expressing individual ETA and turn radius per waypoint.
 
 ====== Review of ASM DAC=219; FI=02 - "Route suggestion"
@@ -486,7 +486,7 @@ Review of the application specific message DAC=219; FI=01 defined by <<ASM_219_0
 
 1. The purpose of this message is to suggest a new route _geometry_.
 1. The message does not support individual ETA or turn radius per waypoint or SOG between waypoints.
-1. The data field "ETA active WP" can be set one year ahead. The good thing about this, is that it complies with the <<minimum_datatypes>> design criteria; but the bad thing is that it wastes bits; since the lifespan of a tactical voyageplan can probably be expressed in the order of hundres of minutes correponding to 10 bits of information.
+1. The data field "ETA active WP" can be set one year ahead. The good thing about this, is that it complies with the <<minimum_datatypes>> design criteria; but the bad thing is that it wastes bits; since the lifespan of a tactical voyage plan can probably be expressed in the order of hundres of minutes correponding to 10 bits of information.
 1. In <<ASM_219_01>> the data field "number of waypoints" is redundant with message length and thus violates the design criteria <<single_point_of_truth>>. It is unclear whether message length or data field "number of waypoints" determines the no. of waypoint. In either case, the bits used for the data field "number of waypoints" could be saved.
 
 In conclusion, DAC=219; FI=02 has some of the same discrepancies as DAC=001; FI=27. It is clear that this message intended for communicating suggestions of route geometry - not speed-based flow management.
@@ -499,10 +499,10 @@ Following the arguments above, the following AIS messages are suggested to be us
 |===
 |Message purpose |Message type |Defined by
 
-|Tactical voyageplan broadcast           | ASM DAC=219; FI=01 |<<ASM_219_01>> +
-Appendix: <<tactical_voyageplan_broadcast>>
-|Tactical voyageplan broadcast, extended | ASM DAC=219; FI=02 |Appendix: <<tactical_voyageplan_broadcast_extended>>.
-|Tactical voyageplan inquiry             | ASM DAC=001; FI=03 |Appendix: <<tactical_voyageplan_inquiry>>.
+|Tactical voyage plan broadcast           | ASM DAC=219; FI=01 |<<ASM_219_01>> +
+Appendix: <<tactical_voyage plan_broadcast>>
+|Tactical voyage plan broadcast, extended | ASM DAC=219; FI=02 |Appendix: <<tactical_voyage plan_broadcast_extended>>.
+|Tactical voyage plan inquiry             | ASM DAC=001; FI=03 |Appendix: <<tactical_voyage plan_inquiry>>.
 |Flow management suggestion              | ASM DAC=219; FI=04 |Appendix: <<flow_management_suggestion>>.
 |===
 
@@ -563,8 +563,8 @@ Appendix: <<tactical_voyageplan_broadcast>>
 
 The following AIS message definitions are proposed for flow management support.
 
-[[tactical_voyageplan_broadcast]]
-=== tactical voyageplan broadcast (defined)
+[[tactical_voyage plan_broadcast]]
+=== tactical voyage plan broadcast (defined)
 Formally proposed specification copied from <<ASM_219_01>>:
 
 ====
@@ -655,15 +655,15 @@ Waypoints
 
 ====
 
-[[tactical_voyageplan_broadcast_extended]]
-=== Tactical voyageplan broadcast, extended (proposal)
+[[tactical_voyage plan_broadcast_extended]]
+=== Tactical voyage plan broadcast, extended (proposal)
 
 ====
 *Transmitter* +
 Vessels only.
 
 *Transmission prerequisites* +
-The message is only transmitted if vessel is conned along an active voyageplan.
+The message is only transmitted if vessel is conned along an active voyage plan.
 
 *Transmission triggering events* +
 The following events must trigger a transmission of this message:
@@ -674,7 +674,7 @@ The following events must trigger a transmission of this message:
 (change to waypoints or change of ETA to any waypoint of more than 10 minutes).
 1. On voyage plan deactivation/cancellation.
 1. On change of active waypoint.
-1. As reply to message "tactical voyageplan inquiry".
+1. As reply to message "tactical voyage plan inquiry".
 
 *Retransmission* +
 Retransmission is not applicable.
@@ -694,7 +694,7 @@ Waypoints are denoted WP~_0_~, WP~_1_~, WP~_i_~,..., WP~_n_~ and are navigated i
 |Source ID |30 |MMSI number of source station.
 |Spare |1 |Not used. Set to zero.
 |IAI |16 |*DAC = 219; FI = 4*
-3+^.^|_Message may end here to indicate cancellation of previously announced tactical voyageplan._|
+3+^.^|_Message may end here to indicate cancellation of previously announced tactical voyage plan._|
 TR |7 |Turn circle radius. +
 Type: Integer. Unit: 1/100 of a nautical mile. +
 0 = no value +
@@ -716,7 +716,7 @@ n ∈ {0..14} +
 *191* +
 *...* +
 *1010*
-|55 bits for cancellation of tactical voyageplan. +
+|55 bits for cancellation of tactical voyage plan. +
 128 bits for WP~0~, no following WP's. +
 191 bits for WP~0~, 1 following WP. +
 ... +
@@ -763,8 +763,8 @@ Integer value; [0-255]. +
 
 ====
 
-[[tactical_voyageplan_inquiry]]
-=== Tactical voyageplan inquiry (proposal)
+[[tactical_voyage plan_inquiry]]
+=== Tactical voyage plan inquiry (proposal)
 
 ====
 
@@ -774,17 +774,17 @@ Vessels and coordination centres.
 *Transmission triggering events* +
 The following events should trigger transmission:
 
-1. On need by control centre to receive tactical voyageplan from a vessel. In case of e.g.:
+1. On need by control centre to receive tactical voyage plan from a vessel. In case of e.g.:
 - A vessel's arrival to controlled area.
-- A vessel's previously announced tactical voyageplan is considered invalid by the inquirer, e.g. because
+- A vessel's previously announced tactical voyage plan is considered invalid by the inquirer, e.g. because
 * the timestamp of the active waypoint is in the past.
-* the vessel's manouvers deviate significantly from its announced tactical voyageplan.
+* the vessel's manouvers deviate significantly from its announced tactical voyage plan.
 - Loss of data in control center.
-1. On need by vessel to receive tactical voyageplan from another vessel.
+1. On need by vessel to receive tactical voyage plan from another vessel.
 - The inquired vessel's intentions are unknown to the inquirying vessel; e.g. in case of
-* Tactical voyageplan was never transmitted by inquired vessel.
-* Tactical voyageplan was never received by inquirying vessel.
-* Information about another vessel's tactical voyageplan was lost onboard the inquirying vessel (e.g. due to system restart or improper operation).
+* Tactical voyage plan was never transmitted by inquired vessel.
+* Tactical voyage plan was never received by inquirying vessel.
+* Information about another vessel's tactical voyage plan was lost onboard the inquirying vessel (e.g. due to system restart or improper operation).
 
 *Retransmission* +
 Except in the sense of missing protocol acknowledgement as per <<AISSPEC5>>, Annex 8 §3.5 -- retransmission is not applicable.
@@ -819,7 +819,7 @@ Latitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, 
 |*Total* |*88-198* |
 |===
 
-If the _flow managed_ area is included in the transmission, it is to be interpreted by the addressed vessel as a request for it to broadcast message "Tactical voyageplan broadcast, extended" as per its transmission trigger criteria, whilst the vessel is inside the designated area.
+If the _flow managed_ area is included in the transmission, it is to be interpreted by the addressed vessel as a request for it to broadcast message "Tactical voyage plan broadcast, extended" as per its transmission trigger criteria, whilst the vessel is inside the designated area.
 
 [cols="8,>2,>2"]
 .No. of transmission slots.
@@ -841,16 +841,16 @@ Coordination centers (for controlled flow management).
 *Transmission prerequisites* +
 The message is only transmitted if the receiving vessel has previously broadcast a tactical voyage plan which is still considered valid by the control center (e.g. ETA of active waypoint is in the future).
 
-This message can only be sent in response to a "Tactical voyageplan broadcast" or a "Tactical voyageplan broadcast, extended".
+This message can only be sent in response to a "Tactical voyage plan broadcast" or a "Tactical voyage plan broadcast, extended".
 
-The latitude and longitude of suggested active and planned waypoints must match exactly those received in the latest "Tactical voyageplan broadcast" or a "Tactical voyageplan broadcast, extended". If this is not the case, the vessel, to which the flow management suggestion is addressed, must disregard it, and broadcast a new tactical voyageplan message.
+The latitude and longitude of suggested active and planned waypoints must match exactly those received in the latest "Tactical voyage plan broadcast" or a "Tactical voyage plan broadcast, extended". If this is not the case, the vessel, to which the flow management suggestion is addressed, must disregard it, and broadcast a new tactical voyage plan message.
 
-If the flow management suggestion is sent in response to a "Tactical voyageplan broadcast" containing 15 or 16 waypoints, only the first 14 need to be included.
+If the flow management suggestion is sent in response to a "Tactical voyage plan broadcast" containing 15 or 16 waypoints, only the first 14 need to be included.
 
 *Transmission triggering events* +
 The following events must trigger a transmission of this message:
 
-1. On coordination center determining that speed-based changes to tactical voyageplan of vessel will lead to a better overall flow.
+1. On coordination center determining that speed-based changes to tactical voyage plan of vessel will lead to a better overall flow.
 
 *Retransmission* +
 Retransmission is not applicable.
@@ -934,9 +934,9 @@ Integer value; [0-255]. +
 |===
 |Term |Definition
 
-|Strategic voyageplan | MONALISA 2 term for long term planning that consists of a route with a voyage number (and other Route information), a list of waypoints (geometry), a schedule, charter parties, legal conditions, and more. When a Strategic voyage plan is given to the ship as a voyage order it changes to _dynamic voyageplan_.
-|Dynamic voyageplan | MONALISA 2 term for an optimised version of the _strategic voyageplan_
-|Tactical voyageplan | MONALISA 3 term for a dynamic voyageplan in conning mode; i.e. under tactical execution. Whole or parts of the tactical voyage plan can be transmitted to increase situational awareness and support flow management.
+|Strategic voyage plan | MONALISA 2 term for long term planning that consists of a route with a voyage number (and other Route information), a list of waypoints (geometry), a schedule, charter parties, legal conditions, and more. When a Strategic voyage plan is given to the ship as a voyage order it changes to _dynamic voyage plan_.
+|Dynamic voyage plan | MONALISA 2 term for an optimised version of the _strategic voyage plan_
+|Tactical voyage plan | MONALISA 3 term for a dynamic voyage plan in conning mode; i.e. under tactical execution. Whole or parts of the tactical voyage plan can be transmitted to increase situational awareness and support flow management.
 |Turn circle radius | Merchant ships usually turn in a circle having a radius of about 6–8 times the length between perpendiculars. Turn radius varies little with speed, but can vary significantly between manouvers in deep and shallow waters. The radius depends on the size and geometry of a vessel, the size of its rudder, and the no. and characteristics of propellers. Cf. <<SBTCD>> for more.
 |===
 
