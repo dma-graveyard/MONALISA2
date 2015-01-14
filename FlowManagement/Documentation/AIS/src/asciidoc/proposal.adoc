@@ -545,10 +545,57 @@ Appendix: <<tactical_voyageplan_broadcast>>
 |===
 
 == Test data
+The test data pairs listed in this section are calculated (and can be validated) as described in the appendix: <<compute_test_data_pairs>>.
+
+=== Tactical voyageplan broadcast
+
+=== Tactical voyageplan broadcast, extended
+
+This message comes in two variants: With and without geographical boundaries of the controlled area.
+
+==== Variant 1: Without controlled area
+[cols="1,3"]
+|===
+|Parameter |Test value
+
+|Message ID |6
+|Repeat Indicator |2
+|Src ID |219000001
+|Seq. no. |2
+|Dest. ID |219019416
+|Retransmit Flag |0
+|Spare |0
+.2+|IAI |DAC=291
+|FI=5
+|===
+
+----
+!AIVDM,1,1,0,,63@ndh@l=v9P=dD,2*61
+----
+
+==== Variant 2: With controlled area
+
+
+=== Tactical voyageplan, inquiry
+
+=== Flow management suggestion
 
 === AIS
 
 == Reference implementation
+
+A reference implementation of encoding and decoding of the flow management related AIS messages programmed in Java is publically available in https://github.com/tbsalling/AisLib/tree/flow-management.
+
+=== Tactical voyageplan broadcast
+
+=== Tactical voyageplan broadcast, extended
+
+=== Tactical voyageplan, inquiry
+The reference implementation of the _tactical voyageplan, inquiry_ message is located in https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/main/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiry.java
+
+with an accompanying unit test class in https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiryTest.java.
+
+=== Flow management suggestion
 
 === AIS
 
@@ -924,6 +971,72 @@ Integer value; [0-255]. +
 
 ====
 
+[[compute_test_data_pairs]]
+== Calculating test data pairs
+A test data pair can be computed like this: First, a message variant is chosen - and test data values are chosen for each data field. This is an example for the _tactical voyageplan, inquiry_ message in its simplest variant:
+
+[cols="4,>2,>4,12"]
+|===
+|Parameter |Bits |Test value (decimal) | Test value (binary)
+
+|Message ID |6 |6 |000110
+|Repeat Indicator |2 |0 |00
+|Src ID |30 |219000001 |001101000011011010110011000001
+|Seq. no. |2 |0 |00
+|Dest. ID |30 |219019416 |001101000011011111100010011000
+|Retransmit Flag |1 |0 |0
+|Spare | 1|0 |0
+.2+|IAI |10 |DAC=291 |0011011011
+>|6 |FI=5 <|000101
+|*Total* | |*88* |
+|===
+
+Then, concatenating all the binary values and grouping them into 6-bit nibbles yields:
+
+----
+000110 000011 010000 110110 101100 110000
+010000 110100 001101 111110 001001 100000
+001101 101100 0101
+----
+
+Since the last nibble contains only four bits, it must be zero-padded to fill up an entire nibble, like this:
+
+----
+000110 000011 010000 110110 101100 110000
+010000 110100 001101 111110 001001 100000
+001101 101100 010100
+----
+
+Using table 2 in the "AIVDM/AIVDO Payload Armoring"-section of <<RAYMOND>>, these 15 6-bit nibbles can be converted into ASCII like this:
+
+----
+000110 -> "6"
+000011 -> "3"
+010000 -> "@"
+110110 -> "n"
+101100 -> "d"
+110000 -> "h"
+010000 -> "@"
+110100 -> "l"
+001101 -> "="
+111110 -> "v"
+001001 -> "9"
+100000 -> "P"
+001101 -> "="
+101100 -> "d"
+010100 -> "D"
+----
+
+In conclusion the ASCII-armoured representation of this message is: `63@ndh@l=v9P=dD`.
+
+In communication with a base station or a transponder, this ASCII-armoured value needs to be in the payload of an NMEA0183 message like VDM or VDO, like this:
+
+`!AIVDM,1,1,0,,63@ndh@l=v9P=dD,2*61`
+
+The \*-separated suffix ("*61") is the NMEA 0183 data-integrity CRC32 checksum for the sentence, preceded by "*". It is computed on the entire sentence including the AIVDM tag but excluding the leading "!". The algorithm is explained in <<WIKINMEA>> -- In this case it yields "61".
+
+A good explanation of NMEA encapsulation of AIS data is found in the "AIVDM/AIVDO Sentence Layer" section of <<RAYMOND>>.
+
 [glossary]
 == Glossary
 
@@ -979,6 +1092,11 @@ Integer value; [0-255]. +
 [[[TOILS]]] "The Toils of AIS: A Case Study in Application Protocol Design And Analysis" by Eric S. Raymond and Kurt Schwehr. 2013. Available from http://gitorious.org/toils-of-ais/toils-of-ais/
 
 [[[ARCH]]] "Architecture for STM in EMSN and STM Data format for Route Exchange".
+
+[[[RAYMOND]]] "AIVDM/AIVDO protocol decoding" by Eric S. Raymond
+<esr@thyrsus.com>. Version 1.46, Aug 2014. http://catb.org/gpsd/AIVDM.html.
+
+[[[WIKINMEA]]] "NMEA 0183", Aug 28, 2014. http://en.wikipedia.org/wiki/NMEA_0183.
 
 === Web resources
 
