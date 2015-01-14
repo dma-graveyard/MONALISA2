@@ -1057,9 +1057,45 @@ In communication with a base station or a transponder, this ASCII-armoured value
 
 `!AIVDM,1,1,0,,63@ndh@l=v9P=dD,2*61`
 
-The \*-separated suffix ("*61") is the NMEA 0183 data-integrity CRC32 checksum for the sentence, preceded by "*". It is computed on the entire sentence including the AIVDM tag but excluding the leading "!". The algorithm is explained in <<WIKINMEA>> -- In this case it yields "61".
-
 A good explanation of NMEA encapsulation of AIS data is found in the "AIVDM/AIVDO Sentence Layer" section of <<RAYMOND>>.
+
+The \*-separated suffix ("*61") is the NMEA 0183 data-integrity CRC32 checksum for the sentence, preceded by "*". It is computed on the entire sentence including the AIVDM tag but excluding the leading "!" and the trailing "*". The checksum is computed as the last to digits of the XOR of all of the bytes in the sentence in hexadecimal notation. As explained by <<WIKINMEA>> the C implementation can look like this:
+
+[source, c]
+----
+#include <stdio.h>
+#include <string.h>
+
+int checksum(char *s) {
+  int c = 0;
+
+  while(*s)
+    c ^= *s++;
+
+  return c;
+}
+
+int main()
+{
+  char mystring[] = "AIVDM,1,1,0,,63@ndh@l=v9P=dD,2";
+  printf("Checksum: 0x%02X\n", checksum(mystring));
+  return 0;
+}
+----
+
+Running the algorithm as a C program yields:
+
+----
+$ gcc checksum.c
+$ ./a.out
+Checksum: 0x61
+----
+
+Thus -- this particular case -- the checksum is 0x61 and thus the complete NMEA amour containing our AIS data is:
+
+----
+!AIVDM,1,1,0,,63@ndh@l=v9P=dD,2*61
+----
 
 [glossary]
 == Glossary
