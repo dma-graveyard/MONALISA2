@@ -590,10 +590,10 @@ This message comes in two variants: With and without geographical boundaries of 
 |Spare |0
 .2+|IAI |DAC = 291
 |FI = 5
-.4+|Controlled area | North = 55° 50' 2.7594" = 55.8341
-| East = 9° 56' 46.3194" = 9.9462
-| South = 55° 48' 39.96" = 55.8111
-| West = 9° 59' 35.5194" = 9.9932
+.4+|Controlled area | North = 55°N 50' 2.7594" = 55.8341
+| East = 9°E 56' 46.3194" = 9.9462
+| South = 55°N 48' 39.96" = 55.8111
+| West = 9°E 59' 35.5194" = 9.9932
 |===
 
 ----
