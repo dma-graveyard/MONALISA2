@@ -1,6 +1,6 @@
 = Message exchange for flow management in maritime traffic management systems.
 Thomas Borg Salling <tbsalling@tbsalling.dk>
-v0.0, January 14, 2015: Work in progress
+v0.1, January 16, 2015: 1st draft for review.
 :keywords: imo, iala, ais, itu-r-1371, monalisa, ten-t
 :toc-placement: preamble
 :icons: font
@@ -13,7 +13,7 @@ image::images/eu.png[align="center"]
 
 [cols="1,2,4,4"]
 |===
-|v0.0 |14 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |Work in progress.
+|v0.1 |16 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |1st draft for review.
 |===
 
 [abstract]
@@ -375,7 +375,7 @@ Retransmission is not applicable.
 
 | Receiver | Required | Receiver identification
 | Sender | Required | Sender identification
-| Controlled area | Optional | Indication of controlled area inside which to routinely broadcast tactical voyageplan.
+| Duration| Required | Relative time for which the vessel is requested to transmit tactical voyageplan periodically.
 |===
 
 The message can be transmitted by vessels or shore-based coordination centres.
@@ -559,9 +559,9 @@ The test data pairs listed in this section are calculated (and can be validated)
 
 === Tactical voyageplan, inquiry
 
-This message comes in two variants: With and without geographical boundaries of the controlled area.
+This message comes in just one variant.
 
-==== Variant 1: Without controlled area
+==== Variant 1: Inquiry with duration
 [cols="1,3"]
 |===
 |Parameter |Test value
@@ -575,10 +575,11 @@ This message comes in two variants: With and without geographical boundaries of 
 |Spare |0
 .2+|IAI |DAC = 291
 |FI = 5
+|Duration |240
 |===
 
 ----
-!AIVDM,1,1,0,,63@ndh@l=v9P=dD,2*61
+!AIVDM,1,1,0,,63@ndh@l=v9P=dGh,0*08
 ----
 
 ==== Variant 2: With controlled area
@@ -612,16 +613,22 @@ This message comes in two variants: With and without geographical boundaries of 
 
 == Reference implementation
 
-A reference implementation of encoding and decoding of the flow management related AIS messages programmed in Java is publically available in https://github.com/tbsalling/AisLib/tree/flow-management.
+A reference implementation of encoding and decoding of the flow management related AIS messages programmed in Java is publically available in:
+
+- https://github.com/tbsalling/AisLib/tree/flow-management.
 
 === Tactical voyageplan broadcast
 
 === Tactical voyageplan broadcast, extended
 
 === Tactical voyageplan, inquiry
-The reference implementation of the _tactical voyageplan, inquiry_ message is located in https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/main/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiry.java
+The reference implementation of the _tactical voyageplan, inquiry_ message is located in
 
-with an accompanying unit test class in https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiryTest.java.
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/main/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiry.java
+
+with an accompanying unit test class in
+
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiryTest.java.
 
 === Flow management suggestion
 
@@ -774,15 +781,15 @@ TR |7 |Turn circle radius. +
 Type: Integer. Unit: 1/100 of a nautical mile. +
 0 = no value +
 1 - 127 = turn circle radius of 0.01 nm - 1.27nm
-.2+|ETA of WP~0~ |5 |UTC hour +
+.2+|ETA of WP~_0_~ |5 |UTC hour +
 Integer value +
 Values outside the range 0-23 are illegal and must not be used. +
 Values are current or future.
 >|6 <|UTC minute +
 Integer value +
 Values outside the range 0-59 are illegal and must not be used.
-|WP~0~, longitude |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
-|WP~0~, latitude |27 | Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+|WP~_0_~, longitude |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
+|WP~_0_~, latitude |27 | Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
 |Following waypoints with ETA | n × 63 | Variable no. of planned waypoints and ETA's. +
 n ∈ {0..14} +
  See table 2
@@ -792,10 +799,10 @@ n ∈ {0..14} +
 *...* +
 *1010*
 |55 bits for cancellation of tactical voyageplan. +
-128 bits for WP~0~, no following WP's. +
-191 bits for WP~0~, 1 following WP. +
+128 bits for WP~_0_~, no following WP's. +
+191 bits for WP~_0_~, 1 following WP. +
 ... +
-1010 bits for WP~0~, 14 following WP. +
+1010 bits for WP~_0_~, 14 following WP. +
 |===
 
 [cols="4,>2,12"]
@@ -826,6 +833,7 @@ Integer value; [0-255]. +
 |Active waypoint, 5 following waypoints | 443 | 3
 |Active waypoint, 6 following waypoints | 506 | 3
 |Active waypoint, 7 following waypoints | 569 | 3
+3+^.^|_Transmitting more than 3 slots is not recommended_
 | _Active waypoint, 8 following waypoints_ | _632_ | _4_
 | _Active waypoint, 9 following waypoints_ | _695_ | _4_
 | _Active waypoint, 10 following waypoints_ | _758_ | _4_
@@ -878,31 +886,24 @@ Except in the sense of missing protocol acknowledgement as per <<AISSPEC5>>, Ann
 |Sequence number |2 |0-3; refer to <<AISSPEC5>> §5.3.1, Annex 2
 |Destination ID |30 |MMSI number of destination station.
 |Retransmit Flag |1 |Retransmit Flag should be set upon retransmission: +
-0 = no retransmission = default +
+0 = no retransmission = default
 1 = retransmitted.
 |Spare |1 |Not used. Set to zero.
 |IAI |16 |*DAC = 219; FI = 5*
-3+^.^|_Message may end here - remaining fields are optional (all or none)_
-.4+|Flow managed area | 28 | Northern limit, longitude +
-Longitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
->| 27 <| Eastern limit, latitude +
-Latitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
->| 28 <| Southern limit, longitude +
-Longitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
->| 27 <| Western limit, latitude +
-Latitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
-|*Total* |*88-198* |
+|Duration |8 |0 = One-shot inquiry with no request to transmit periodically _or_ (if the addressed vessel is still periodically transmitting as a result of a previous inquiry from the same source) a request to cease periodic transmissions of tactical voyageplan. +
+ +
+1-255 = Duration (in minutes) for which the addressed vessel is requested to transmit its tactical voyageplan periodically, as per triggering criteria of <<tactical_voyageplan_broadcast>> and  <<tactical_voyageplan_broadcast_extended>>. If a retransmission period (requested from the same source) has not yet expired, the duration is reset to the new value. +
+ +
+Type: Integer.
+|*Total* |*96* |
 |===
-
-If the _flow managed_ area is included in the transmission, it is to be interpreted by the addressed vessel as a request for it to broadcast message "Tactical voyageplan broadcast, extended" as per its transmission trigger criteria, whilst the vessel is inside the designated area.
 
 [cols="8,>2,>2"]
 .No. of transmission slots.
 |===
 |Payload | Bits | Slots
 
-|Inquiry without area | 88 | 1
-|Inquiry with area | 198 | 2
+|Inquiry | 96 | 1
 ====
 
 [[flow_management_suggestion]]
@@ -946,15 +947,15 @@ Waypoints are denoted WP~_0_~, WP~_1_~, WP~_i_~,..., WP~_n_~ and are navigated i
 |Spare |1 |Not used. Set to zero.
 |IAI |16 |*DAC = 219; FI = 6*
 .2+|Suggested +
-ETA of WP~0~ |5 |UTC hour +
+ETA of WP~_0_~ |5 |UTC hour +
 Integer value +
 Values outside the range 0-23 are illegal and must not be used.
 Values are current or future.
 >|6 <|UTC minute +
 Integer value +
 Values outside the range 0-59 are illegal and must not be used.
-|WP~0~, longitude |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
-|WP~0~, latitude |27 | Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+|WP~_0_~, longitude |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
+|WP~_0_~, latitude |27 | Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
 |Following suggested waypoints with suggested ETA | n × 63 | Variable no. of suggested waypoints and ETA's. +
 n ∈ {0..14} +
 See table 2
@@ -988,6 +989,7 @@ Integer value; [0-255]. +
 |Suggested active waypoint, 5 following suggested waypoints | 436 | 3
 |Suggested active waypoint, 6 following suggested waypoints | 499 | 3
 |Suggested active waypoint, 7 following suggested waypoints | 562 | 3
+3+^.^|_Transmitting more than 3 slots is not recommended_
 | _Suggested active waypoint, 8 following suggested waypoints_ | _625_ | _4_
 | _Suggested active waypoint, 9 following suggested waypoints_ | _688_ | _4_
 | _Suggested active waypoint, 10 following suggested waypoints_ | _751_ | _4_
@@ -1003,7 +1005,7 @@ Integer value; [0-255]. +
 
 [[compute_test_data_pairs]]
 == Calculating test data pairs
-A test data pair can be computed like this: First, a message variant is chosen - and test data values are chosen for each data field. This is an example for the _tactical voyageplan, inquiry_ message in its simplest variant:
+A test data pair can be computed like this: First, a message variant is chosen - and test data values are chosen for each data field. This is an example for the _tactical voyageplan, inquiry_ message:
 
 [cols="4,>2,>4,12"]
 |===
@@ -1018,6 +1020,7 @@ A test data pair can be computed like this: First, a message variant is chosen -
 |Spare | 1|0 |0
 .2+|IAI |10 |DAC=291 |0011011011
 >|6 |FI=5 <|000101
+|Duration | 8|240|11110000
 |*Total* | |*88* |
 |===
 
@@ -1026,16 +1029,10 @@ Then, concatenating all the binary values and grouping them into 6-bit nibbles y
 ----
 000110 000011 010000 110110 101100 110000
 010000 110100 001101 111110 001001 100000
-001101 101100 0101
+001101 101100 010111 110000
 ----
 
-Since the last nibble contains only four bits, it must be zero-padded to fill up an entire nibble, like this:
-
-----
-000110 000011 010000 110110 101100 110000
-010000 110100 001101 111110 001001 100000
-001101 101100 010100
-----
+Incidentally, the last nibble fills up to six bits. If it didn't zero's would have to be padded at the end until the total number of bits were a multiple of six.
 
 Using table 2 in the "AIVDM/AIVDO Payload Armoring"-section of <<RAYMOND>>, these 15 6-bit nibbles can be converted into ASCII like this:
 
@@ -1054,18 +1051,19 @@ Using table 2 in the "AIVDM/AIVDO Payload Armoring"-section of <<RAYMOND>>, thes
 100000 -> "P"
 001101 -> "="
 101100 -> "d"
-010100 -> "D"
+010111 -> "G"
+110000 -> "h"
 ----
 
-In conclusion the ASCII-armoured representation of this message is: `63@ndh@l=v9P=dD`.
+In conclusion the ASCII-armoured representation of this message is: `63@ndh@l=v9P=dGh`.
 
 In communication with a base station or a transponder, this ASCII-armoured value needs to be in the payload of an NMEA0183 message like VDM or VDO, like this:
 
-`!AIVDM,1,1,0,,63@ndh@l=v9P=dD,2*61`
+`!AIVDM,1,1,0,,63@ndh@l=v9P=dGh,0*08`
 
 A good explanation of NMEA encapsulation of AIS data is found in the "AIVDM/AIVDO Sentence Layer" section of <<RAYMOND>>.
 
-The \*-separated suffix ("*61") is the NMEA 0183 data-integrity CRC32 checksum for the sentence, preceded by "*". It is computed on the entire sentence including the AIVDM tag but excluding the leading "!" and the trailing "*". The checksum is computed as the last to digits of the XOR of all of the bytes in the sentence in hexadecimal notation. As explained by <<WIKINMEA>> the C implementation can look like this:
+The \*-separated suffix ("*08") is the NMEA 0183 data-integrity CRC32 checksum for the sentence, preceded by "*". It is computed on the entire sentence including the AIVDM tag but excluding the leading "!" and the trailing "*". The checksum is computed as the last to digits of the XOR of all of the bytes in the sentence in hexadecimal notation. As explained by <<WIKINMEA>> the C implementation can look like this:
 
 [source, c]
 ----
@@ -1083,7 +1081,7 @@ int checksum(char *s) {
 
 int main()
 {
-  char mystring[] = "AIVDM,1,1,0,,63@ndh@l=v9P=dD,2";
+  char mystring[] = "AIVDM,1,1,0,,63@ndh@l=v9P=dGh,0";
   printf("Checksum: 0x%02X\n", checksum(mystring));
   return 0;
 }
@@ -1094,13 +1092,13 @@ Running the algorithm as a C program yields:
 ----
 $ gcc checksum.c
 $ ./a.out
-Checksum: 0x61
+Checksum: 0x08
 ----
 
-Thus -- this particular case -- the checksum is 0x61 and thus the complete NMEA amour containing our AIS data is:
+Thus -- this particular case -- the checksum is 0x08 and thus the complete NMEA amour containing our AIS data is:
 
 ----
-!AIVDM,1,1,0,,63@ndh@l=v9P=dD,2*61
+!AIVDM,1,1,0,,63@ndh@l=v9P=dGh,0*08
 ----
 
 [glossary]
