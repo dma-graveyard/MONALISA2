@@ -51,7 +51,7 @@ M.Sc. Jens Kristian Jensen <JKJ@dma.dk>
 === Problem definition
 
 ==== Flow management
-As defined by <<ARCH>> flow management is communication which takes place between ships in a peer-to-peer situation, or between ships and a coordinating organisation (e.g. VTS, STCC) in order to:
+As defined by <<ARCH>> flow management is communication which takes place between ships in a peer-to-peer situation, or between ships and a coordinating organisation (denoted STCC in this document, similar to a VTS conducting some level of service similar to Traffic Organisation Service) in order to:
 
 1. Increase safety and prevent delays through a good flow in narrow channels with high traffic density.
 1. Support vessel in arriving at final destination in due time as efficient as possible.
@@ -59,22 +59,22 @@ As defined by <<ARCH>> flow management is communication which takes place betwee
 
 For item 1 the term "good" means that collisions and dangerous situations are avoided and that vessels can safely follow their announced tactical voyageplan through the area.
 
-Flow _management_ is based on knowledge of vessels' tactical voyageplans; i.e. announcements from each vessel regarding their intended manouvers in the immediate short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for the coordination centre or the nearby vessels to suggest tactical voyageplans to a vessel with the purpose of obtaining a "good" overall flow. This process is called _flow management_.
+Flow _management_ is based on knowledge of vessels' tactical voyageplans; i.e. announcements from each vessel regarding their intended manouvers in the immediate short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for a vessel to better understand the intentions of other nearby vessels and adjust own tactical route to achieve better flow, or for the coordination centre to suggest adjustments to tactical route, with the purpose of obtaining a "good" overall flow. This process is called _flow management_.
 
-If flow management takes place in a self-organizaing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- all vessels can safely and efficiently follow their tactical voyageplans through their entire passage of the area.
+If flow management takes place in a self-organizaing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- the risk of situations escalating to a level that require the application of collision avoidance regulations can be minimized.
 
 ===== Tactical voyageplan
-In order to facilitate flow management vessels in the area must broadcast their tactical voyageplan and optionally basic information concerning their manouvering capabilities.
+In order to facilitate flow management vessels in the area must broadcast their tactical voyageplan and optionally basic information concerning their manouvering capabilities, such as turning radius.
 
 ===== Flow management suggestion
-A suggested change to a tactical voyageplan is called a _flow management suggestion_. A flow management suggestion can be transmitted from either a coordination centre or a peer vessel. It can take one of two principal forms:
+A suggested change to a tactical voyageplan is called a _flow management suggestion_. It can take one of two principal forms:
 
 1. Geometry-based (adding, deleting or changing waypoints)
 1. Speed-based (not changing any waypoints)
 
 Changing the geometry of an tactical voyageplan is a relatively complex operation for the vessel's navigator. Among other things the process involves a safety check of the new route and reprogramming of navigational equipment. The cost/workload of this operation reduces the likelihood of a vessel complying with suggested changes.
 
-Changing the vessel's speed (or waypoint ETA's) is a far simpler operation for the navigator. This involves only adjustment of the vessel's speed and recalculation of the wheel-over-point in advance of each waypoint. It is therefore expected, that the likelihood of a of vessel complying with a suggested change of this type is higher than suggested changes to geometry.
+Changing the vessel's speed (or waypoint ETA's) is a far simpler operation for the navigator. This involves only adjustment of the vessel's speed. It is therefore expected, that the likelihood of a of vessel complying with a suggested change of this type is higher than suggested changes to geometry.
 
 ==== Controlled flow management
 Controlled flow management always takes place inside a defined geographical area called the _controlled area_. The controlled area is a closed polygon.
@@ -92,17 +92,23 @@ Vessels inside the controlled area can be in states
 
 Some of the vessels are aware of some of the other vessels' tactical voyageplans, and the coordination centre is aware of some of the vessel's tactical voyageplans.
 
-The coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages, so that it can maintain an updated real-time picture of the current traffic situation.
+As any coordinating organization the coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages, so that it can maintain an updated real-time picture of the current traffic situation.
 
 [[img-controlled-area]]
 .A controlled area and five vessels showing their intended routes. There are vessels outside (1, 2) and vessels inside (3-5) the controleld area. A vessel (2) is entering, a vessel is leaving (3), and two vessels are staying (4 ,5).
 image::images/controlled_area.png[img-controlled-area, align="center"]
 
 ==== Autonomous flow management
-...
+It has previously been observed in simulator trials, that given the information about the more detailed intentions of another vessel, and the ability to express own tactical plan to peer vessels, navigators quickly adapt to utilizing this mechanism, to clearly express own intention in a narrow passage situation.
+
+Autonomous flow management is thus anticipated to evolve out of the availability of information, that enable navigation systems to better predict realistic CPA and TCPA values and pinpoint likely critical passages at larger distances and longer timewindows, based on sharing the information on the tactical routes of peer vessels.
 
 === Scope of work
 The scope of the work in this paper is _controlled flow management in a limited area (in order of size as a VTS area) based on flow management suggestions in the speed-based form_.
+
+Use cases will be used to describe the events and actions of conversations (information exchange) that could support a flow management scenario.
+
+Design criteria and specific design proposals will be described for messages  and conversation sequences, first in generic terms, independant of data transport mechanism, later in specific terms related to utilizing AIS as the communication channel and the Maritime Messaging Service in the Maritime Cloud taking into account the specific limitations of the transport channel.
 
 [[use_cases]]
 == Use cases
@@ -136,7 +142,7 @@ The scope of the work in this paper is _controlled flow management in a limited 
 | {counter:step} | The coordination centre detects that the current flow is not optimal ("good") | The control centre recalculates optimal speeds per vessel.
 | {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
 .2+| {counter:step} | A vessel receives its flow management suggestion  from the coordination centre. | The navigator is alerted.
-| *Exception:* The flow management suggestion is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
+| *Exception:* The flow management suggestion is never received (or is ignored) by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
 | {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
 |===
 
@@ -148,16 +154,13 @@ The scope of the work in this paper is _controlled flow management in a limited 
 
 === Use case: A tactical voyageplan expires
 
-=== Use case: A vessel suggests tactical voyageplan for another vessel
-(in a controlled flow management scenario)
-
 === Use case: Receivers of a vessel's tactical voyageplan have different versions
 (in case of e.g. transmission ok, reception bad).
 
 == Design criteria
 Messaging in the maritime domain has been available many years and communication standards have evolved and been added and augmented several times to accomodate the increasing demand for handling more and more complex scenarios in the maritime domain.
 
-When suggesting message exchange for advanced use cases, such as for flow management, we want to take lessons learned from the past years into account. Literature, has as <<TOILS>>, has therefore been studied to establish a set of design criteria for the messages that are defined for flow management.
+When suggesting message exchange for advanced use cases, such as for flow management, we want to take lessons learned from the past years into account. Literature, such as <<TOILS>>, has therefore been studied to establish a set of design criteria for the messages that are defined for flow management.
 
 In section <<design_validation>> it will be validated, that the suggested messages layouts and payloads are in compliance with these design criteria.
 
@@ -184,11 +187,13 @@ In accordance with <<ARCH>>, §7 p.23, information transfer involving ships must
 This shall be achieved by designing messages to be as compact as possible, avoiding redundant information in message layouts, and using bit-level compression where applicable and possible.
 ====
 
-==== Ship-shore interactions must be robust
+==== Interactions must be robust
 In accordance with <<ARCH>>, §7 p.23, ship-shore interactions must be robust to unstable, changing, high latency links.
 
 ====
-This shall be achieved by ???
+This shall be achieved by designing conversation for robustness - supplement a repetitive broadcast regime with a request/response mechanism, which is activated when a user (ship or shorebased) actively investigates a particular ships intentions, in case the latest revieved broadcast is not sufficiently recent.
+
+If the data transport mechanism supports transport layer acknowledgements, the request/response mechanism can be safeguarded against a message transmission being lost through utilizing these acknowledgement mechanisms.
 ====
 
 ==== Ship-shore data IP connections must be initiated from ship
@@ -196,6 +201,15 @@ In accordance with <<ARCH>>, §7 p.23, ship-shore data connections must be initi
 
 ====
 This shall be achieved by designing the required mechanisms of communication, such that ship-to-shore communication is based on IP-based connection-oriented communication (e.g. TCP/IP), then such a connection can only be initiated from the ship-side.
+====
+
+==== Indication of trust
+When utilizing AIS, anyone can spoof the identity of a ship and interact with others. If utilizing the Maritime Messaging Service -- or some other transport mechanism that offer mechanisms for secure data transport -- the authenticity and integrity of the information exchanged could possibly be guaranteed.
+
+It is important to a navigator or STCC to be able to determine the security level of the information provided.
+
+====
+This shall be achived by designin the user interface of the receiving party to indicate the level of trust that can be associated with the sender.
 ====
 
 === AIS-specific design criteria
@@ -215,14 +229,14 @@ This shall be achieved by ensuring that the final and agreed ASM messages to sup
 ====
 
 ==== Low transmission frequency
-In accordance with <<AISG289>>, §3.3, the frequency of message transmission should be limited in order to prevent system overload.
+In accordance with <<IMOSN289>>, §3.3, the frequency of message transmission should be limited in order to prevent system overload.
 
 ====
 This shall be achieved by careful design of the criteria which trigger a message transmission, in order to minimise the number of transmissions to the lowest possible.
 ====
 
 ==== Limit no. of VHF transmission slots
-In accordance with <<AISG289>>, §3.4, AIS messages occupying more than three (3) slots should be avoided, unless there is a low load on the VDL or a compelling reason to do so.
+In accordance with <<IMOSN289>>, §3.4, AIS messages occupying more than three (3) slots should be avoided, unless there is a low load on the VDL or a compelling reason to do so.
 
 ====
 This shall be achieved by designing messages to avoid occupying more than 3 slots.
@@ -230,6 +244,8 @@ This shall be achieved by designing messages to avoid occupying more than 3 slot
 
 ==== Use 6-bit ASCII
 As pointed out by <<TOILS>> the decision to use 6-bit ASCII encoding in AIS messages is a _blunder_. But as it states: "Some major defects, such as the handling of string data, are too deeply embedded to be removed". Thus in the design of new messages, the 6-bit encoding scheme will be maintained to avoid further complexity to <<AISSPEC5>> and related recommendations and guidelines.
+
+This case is an example of a design blunder, where one possible remedy -- which could promote good quality software -- would be the existence of open source reference implementations of 6-bit ASCII encoding/decoding functions in different programming languages, as a shared, well tested resource.
 
 ====
 This shall be achieved by designing string fields of new messages to use the 6-bit character encoding scheme defined by <<AISSPEC5>> annex 8.
@@ -343,7 +359,7 @@ The sugested payloads and transmission triggers of these message types are the f
 |===
 | Data field | Type | Description
 
-| Sender | Required | Sender identification
+| Source ID | Required | Identity of sender, i.e. the vessel which owns the tactical route
 | Activation indicator | Required | Indication of whether the vessel cancels/deactives its voyageplan or whether it actively follows it.
 | Waypoints | Required | Positions of waypoints on the tactical voyageplan.
 | Active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
@@ -357,7 +373,7 @@ The message must only be transmitted by vessels.
 
 The message is only transmitted if vessel is conned along an active voyageplan. In that case, the following transmission triggers apply:
 
-1. Periodically.footnote:[Using AIS: Every six minutes (due to what is stated in <<AISSPEC5>> (§4.2.1) regarding sending interval for voyage related information]
+1. Periodically.footnote:[Using AIS: To use periodic transmission intervals as defined for _dynamic information_ in Table 1 of <<AISSPEC5>> (§4.2.1)]
 1. On voyage plan activation.
 1. On voyage plan change (change to waypoints or ETA at waypoints).
 1. On voyage plan deactivation/cancellation.
@@ -373,8 +389,8 @@ Retransmission is not applicable.
 |===
 | Data field | Type | Description
 
-| Receiver | Required | Receiver identification
-| Sender | Required | Sender identification
+| Destination ID | Required | Receiver identification
+| Source ID | Required | Sender identification
 | Duration| Required | Relative time for which the vessel is requested to transmit tactical voyageplan periodically.
 |===
 
@@ -393,6 +409,7 @@ The following transmission triggers apply:
 * Tactical voyageplan was never transmitted by inquired vessel.
 * Tactical voyageplan was never received by inquirying vessel.
 * Information about another vessel's tactical voyageplan was lost onboard the inquirying vessel (e.g. due to system restart or improper operation).
+- The age of the most recently received tactical route from is higher than the nominal periodic update rate.
 
 ===== Flow management suggestion
 
@@ -401,7 +418,7 @@ The following transmission triggers apply:
 |===
 | Data field | Type | Description
 
-| Sender | Required | Sender identification
+| Source ID | Required | Sender identification
 | Waypoints | Required | Positions of waypoints on the tactical voyageplan.
 | Suggested active waypoint | Required | Indication of which of the waypoints the vessel is currently navigating towards.
 | Suggested ETA of suggested active waypoint | Required | Suggested time of arrival at active waypoint.
@@ -487,7 +504,7 @@ Review of the application specific message DAC=219; FI=01 defined by <<ASM_219_0
 1. The purpose of this message is to suggest a new route _geometry_.
 1. The message does not support individual ETA or turn radius per waypoint or SOG between waypoints.
 1. The data field "ETA active WP" can be set one year ahead. The good thing about this, is that it complies with the <<minimum_datatypes>> design criteria; but the bad thing is that it wastes bits; since the lifespan of a tactical voyageplan can probably be expressed in the order of hundres of minutes correponding to 10 bits of information.
-1. In <<ASM_219_01>> the data field "number of waypoints" is redundant with message length and thus violates the design criteria <<single_point_of_truth>>. It is unclear whether message length or data field "number of waypoints" determines the no. of waypoint. In either case, the bits used for the data field "number of waypoints" could be saved.
+1. In <<ASM_219_02>> the data field "number of waypoints" is redundant with message length and thus violates the design criteria <<single_point_of_truth>>. It is unclear whether message length or data field "number of waypoints" determines the no. of waypoint. In either case, the bits used for the data field "number of waypoints" could be saved.
 
 In conclusion, DAC=219; FI=02 has some of the same discrepancies as DAC=001; FI=27. It is clear that this message intended for communicating suggestions of route geometry - not speed-based flow management.
 
@@ -582,46 +599,20 @@ This message comes in just one variant.
 !AIVDM,1,1,0,,63@ndh@l=v9P=dGh,0*08
 ----
 
-==== Variant 2: With controlled area
-
-[cols="1,3"]
-|===
-|Parameter |Test value
-
-|Message ID |6
-|Repeat Indicator |2
-|Src ID |219000001
-|Seq. no. |2
-|Dest. ID |219019416
-|Retransmit Flag |0
-|Spare |0
-.2+|IAI |DAC = 291
-|FI = 5
-.4+|Controlled area | North = 55°N 50' 2.7594" = 55.8341
-| East = 9°E 56' 46.3194" = 9.9462
-| South = 55°N 48' 39.96" = 55.8111
-| West = 9°E 59' 35.5194" = 9.9932
-|===
-
-----
-!AIVDM,1,1,0,,63@ndh@l=v9P=dDOte;0egdP?us`PFhu`,0*32
-----
-
 === Flow management suggestion
-
-=== AIS
 
 == Reference implementation
 
+=== AIS
 A reference implementation of encoding and decoding of the flow management related AIS messages programmed in Java is publically available in:
 
 - https://github.com/tbsalling/AisLib/tree/flow-management.
 
-=== Tactical voyageplan broadcast
+==== Tactical voyageplan broadcast
 
-=== Tactical voyageplan broadcast, extended
+==== Tactical voyageplan broadcast, extended
 
-=== Tactical voyageplan, inquiry
+==== Tactical voyageplan, inquiry
 The reference implementation of the _tactical voyageplan, inquiry_ message is located in
 
 - https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/main/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiry.java
@@ -630,12 +621,7 @@ with an accompanying unit test class in
 
 - https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiryTest.java.
 
-=== Flow management suggestion
-
-=== AIS
-
-== Recommended further work
-- autonomous flow management
+==== Flow management suggestion
 
 :numbered!:
 
@@ -646,7 +632,7 @@ with an accompanying unit test class in
 The following AIS message definitions are proposed for flow management support.
 
 [[tactical_voyageplan_broadcast]]
-=== tactical voyageplan broadcast (defined)
+=== Tactical voyageplan broadcast (defined)
 Formally proposed specification copied from <<ASM_219_01>>:
 
 ====
@@ -697,7 +683,9 @@ Intended route (broadcast)
 0 = default +
 3 = do not repeat anymore
 |Source ID |30 |MMSI number of source station.
-|Spare |2footnote:[<<ASM_219_01>> states 1 spare bit; but this is not compliant with the format of message type 8 in <<AISSPEC5>>, which states 2 spare bits. 2 spare bits is assumed to be correct.] |Not used. Set to zero.
+|Spare |2 |Not used. Set to zero. +
+ +
+Note: <<ASM_219_01>> states 1 spare bit; but this is not compliant with the format of message type 8 in <<AISSPEC5>>, which states 2 spare bits. 2 spare bits is assumed to be correct.
 |IAI |16 |*DAC = 219; FI = 1*
 |ETA active WP | |The ETA at the active waypoint (first waypoint). For a cancellation of active route, the default values can be used.
 |UTC Month |4 |1 - 12 +
@@ -750,7 +738,7 @@ The message is only transmitted if vessel is conned along an active voyageplan.
 *Transmission triggering events* +
 The following events must trigger a transmission of this message:
 
-1. Periodically.footnote:[Using AIS: Every six minutes (due to what is stated in <<AISSPEC5>> (§4.2.1) regarding sending interval for voyage related information]
+1. Periodically.footnote:[Using AIS: To use periodic transmission intervals as defined for _dynamic information_ in Table 1 of <<AISSPEC5>> (§4.2.1)]
 1. On voyage plan activation.
 1. On voyage plan change +
 (change to waypoints or change of ETA to any waypoint of more than 10 minutes).
@@ -774,49 +762,53 @@ Waypoints are denoted WP~_0_~, WP~_1_~, WP~_i_~,..., WP~_n_~ and are navigated i
 0 = default +
 3 = do not repeat anymore
 |Source ID |30 |MMSI number of source station.
-|Spare |1 |Not used. Set to zero.
+|Spare |2 |Not used. Set to zero.
 |IAI |16 |*DAC = 219; FI = 4*
-3+^.^|_Message may end here to indicate cancellation of previously announced tactical voyageplan._|
-TR |7 |Turn circle radius. +
-Type: Integer. Unit: 1/100 of a nautical mile. +
-0 = no value +
-1 - 127 = turn circle radius of 0.01 nm - 1.27nm
-.2+|ETA of WP~_0_~ |5 |UTC hour +
+3+^.^|_Message may end here to indicate cancellation of previously announced tactical voyageplan._
+.2+|WP~_0_~, position |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
+>|27 <| Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+.2+|WP~_0_~, ETA |5 |UTC hour +
 Integer value +
 Values outside the range 0-23 are illegal and must not be used. +
 Values are current or future.
 >|6 <|UTC minute +
 Integer value +
 Values outside the range 0-59 are illegal and must not be used.
-|WP~_0_~, longitude |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
-|WP~_0_~, latitude |27 | Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
-|Following waypoints with ETA | n × 63 | Variable no. of planned waypoints and ETA's. +
-n ∈ {0..14} +
+|WP~_0_~, TCR |8 |Turn circle radius at the active waypoint. +
+Type: Integer. Unit: 1/100 of a nautical mile. +
+0 = no value +
+1 - 255 = turn circle radius of 0.01 nm - 2.55nm
+|Following waypoints with ETA and TCR | n × 63 | Variable no. of planned waypoints and ETA's. +
+n ∈ {0..12} +
  See table 2
-|*Total* | *55* +
-*128* +
-*191* +
+|*Total* | *56* +
+*130* +
+*201* +
 *...* +
-*1010*
-|55 bits for cancellation of tactical voyageplan. +
-128 bits for WP~_0_~, no following WP's. +
-191 bits for WP~_0_~, 1 following WP. +
+*982*
+|56 bits for cancellation. +
+130 bits for WP~_0_~, no following WP's. +
+201 bits for WP~_0_~, 1 following WP. +
 ... +
-1010 bits for WP~_0_~, 14 following WP. +
+982 bits for WP~_0_~, 12 following WP. +
 |===
 
 [cols="4,>2,12"]
-.Waypoints with relative ETA's.
+.Following waypoints.
 |===
 |Parameter |No. of bits |Description
 
-|Longitude of WP~_i_~ |28 |Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
-|Latitude of WP~_i_~  |27 |Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
-|Relative ETA at WP~_i_~ | 8 | Relative ETA from previous waypoint; measured in minutes. +
+|WP~_i_~, longitude |28 |Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
+|WP~_i_~, latitude  |27 |Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+|WP~_i_~, relative ETA | 8 | Relative ETA from previous waypoint; measured in minutes. +
 Integer value; [0-255]. +
 0 = Not used. Illegal value. +
 1 - 255 = Relative ETA measured in number of minutes from previous waypoint.
-|*Total* |*63* |
+|WP~_i_~, TCR |8 |Turn circle radius at WP~_i_~. +
+Type: Integer. Unit: 1/100 of a nautical mile. +
+0 = no value +
+1 - 255 = turn circle radius of 0.01 nm - 2.55nm
+|*Total* |*71* |
 |===
 
 [cols="8,>2,>2"]
@@ -825,23 +817,20 @@ Integer value; [0-255]. +
 |Payload | Bits | Slots
 
 |Cancellation | 55 | 1
-|Active waypoint, no following waypoints | 128 | 1
-|Active waypoint, 1 following waypoint | 191 | 2
-|Active waypoint, 2 following waypoints | 254 | 2
-|Active waypoint, 3 following waypoints | 317 | 2
-|Active waypoint, 4 following waypoints | 380 | 3
-|Active waypoint, 5 following waypoints | 443 | 3
-|Active waypoint, 6 following waypoints | 506 | 3
-|Active waypoint, 7 following waypoints | 569 | 3
+|Active waypoint, no following waypoints | 130 | 1
+|Active waypoint, 1 following waypoint | 201 | 2
+|Active waypoint, 2 following waypoints | 272 | 2
+|Active waypoint, 3 following waypoints | 343 | 2
+|Active waypoint, 4 following waypoints | 414 | 3
+|Active waypoint, 5 following waypoints | 485 | 3
+|Active waypoint, 6 following waypoints | 556 | 3
 3+^.^|_Transmitting more than 3 slots is not recommended_
-| _Active waypoint, 8 following waypoints_ | _632_ | _4_
-| _Active waypoint, 9 following waypoints_ | _695_ | _4_
-| _Active waypoint, 10 following waypoints_ | _758_ | _4_
-| _Active waypoint, 11 following waypoints_ | _821_ | _5_
-| _Active waypoint, 12 following waypoints_ | _884_ | _5_
-| _Active waypoint, 13 following waypoints_ | _947_ | _5_
-| _Active waypoint, 14 following waypoints_ | _1010_ | _5_
-
+| _Active waypoint, 7 following waypoints_ | 627 | 4
+| _Active waypoint, 8 following waypoints_ | _698_ | _4_
+| _Active waypoint, 9 following waypoints_ | _769_ | _4_
+| _Active waypoint, 10 following waypoints_ | _840_ | _5_
+| _Active waypoint, 11 following waypoints_ | _911_ | _5_
+| _Active waypoint, 12 following waypoints_ | _982_ | _5_
 |===
 
 ====
@@ -931,49 +920,61 @@ The following events must trigger a transmission of this message:
 *Retransmission* +
 Retransmission is not applicable.
 
-*Message format*
+*Message format* +
 Waypoints are denoted WP~_0_~, WP~_1_~, WP~_i_~,..., WP~_n_~ and are navigated in sequence. WP~_0_~ is the _suggested active waypoint_ currently to be steered towards. WP~_i_~, where _i_ ≥ 1, is called the _following suggested waypoints_.
 
 [cols="4,>2,12"]
 |===
 |Parameter |No. of bits |Description
 
-|Message ID |6 |Identifier for Message 8; always 8.
+|Message ID |6 |Identifier for Message 6; always 6.
 |Repeat Indicator |2 |Used by the repeater to indicate how many times a message has been repeated. +
 0 - 3 +
 0 = default +
 3 = do not repeat anymore
 |Source ID |30 |MMSI number of source station.
+|Sequence number |2 |0-3; refer to <<AISSPEC5>> §5.3.1, Annex 2
+|Destination ID |30 |MMSI number of destination station.
+|Retransmit Flag |1 |Retransmit Flag should be set upon retransmission: +
+0 = no retransmission = default
+1 = retransmitted.
 |Spare |1 |Not used. Set to zero.
 |IAI |16 |*DAC = 219; FI = 6*
-.2+|Suggested +
-ETA of WP~_0_~ |5 |UTC hour +
+.2+|WP~_0_~, position |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
+>|27 <| Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+.2+|WP~_0_~, ETA |5 |UTC hour +
 Integer value +
-Values outside the range 0-23 are illegal and must not be used.
+Values outside the range 0-23 are illegal and must not be used. +
 Values are current or future.
 >|6 <|UTC minute +
 Integer value +
 Values outside the range 0-59 are illegal and must not be used.
-|WP~_0_~, longitude |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
-|WP~_0_~, latitude |27 | Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
-|Following suggested waypoints with suggested ETA | n × 63 | Variable no. of suggested waypoints and ETA's. +
-n ∈ {0..14} +
+|WP~_0_~, TCR |8 |Turn circle radius at the active waypoint. +
+Type: Integer. Unit: 1/100 of a nautical mile. +
+0 = no value +
+1 - 255 = turn circle radius of 0.01 nm - 2.55nm
+|Following waypoints with ETA and TCR | n × 63 | Variable no. of planned waypoints and ETA's. +
+n ∈ {0..12} +
 See table 2
-|*Total* | *121-1003* |
+|*Total* | *162-1014* |
 |===
 
 [cols="4,>2,12"]
-.Waypoints with relative ETA's.
+.Suggested following waypoints.
 |===
 |Parameter |No. of bits |Description
 
-|Longitude of WP~_i_~ |28 |Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
-|Latitude of WP~_i_~  |27 |Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
-|Relative ETA at WP~_i_~ | 8 | Relative ETA from previous waypoint; measured in minutes. +
+|WP~_i_~, longitude |28 |Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
+|WP~_i_~, latitude  |27 |Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+|WP~_i_~, relative ETA | 8 | Relative ETA from previous waypoint; measured in minutes. +
 Integer value; [0-255]. +
 0 = Not used. Illegal value. +
 1 - 255 = Relative ETA measured in number of minutes from previous waypoint.
-|*Total* |*63* |
+|WP~_i_~, TCR |8 |Turn circle radius at WP~_i_~. +
+Type: Integer. Unit: 1/100 of a nautical mile. +
+0 = no value +
+1 - 255 = turn circle radius of 0.01 nm - 2.55nm
+|*Total* |*71* |
 |===
 
 [cols="8,>2,>2"]
@@ -981,22 +982,20 @@ Integer value; [0-255]. +
 |===
 |Payload | Bits | Slots
 
-|Suggested active waypoint, no following suggested waypoints | 121 | 1
-|Suggested active waypoint, 1 following suggested waypoint | 184 | 2
-|Suggested active waypoint, 2 following suggested waypoints | 247 | 2
-|Suggested active waypoint, 3 following suggested waypoints | 310 | 2
-|Suggested active waypoint, 4 following suggested waypoints | 373 | 3
-|Suggested active waypoint, 5 following suggested waypoints | 436 | 3
-|Suggested active waypoint, 6 following suggested waypoints | 499 | 3
-|Suggested active waypoint, 7 following suggested waypoints | 562 | 3
+|Suggested active waypoint, no following suggested waypoints | 162 | 2
+|Suggested active waypoint, 1 following suggested waypoint | 233 | 2
+|Suggested active waypoint, 2 following suggested waypoints | 304 | 2
+|Suggested active waypoint, 3 following suggested waypoints | 375 | 3
+|Suggested active waypoint, 4 following suggested waypoints | 446 | 3
+|Suggested active waypoint, 5 following suggested waypoints | 517 | 3
 3+^.^|_Transmitting more than 3 slots is not recommended_
-| _Suggested active waypoint, 8 following suggested waypoints_ | _625_ | _4_
-| _Suggested active waypoint, 9 following suggested waypoints_ | _688_ | _4_
-| _Suggested active waypoint, 10 following suggested waypoints_ | _751_ | _4_
-| _Suggested active waypoint, 11 following suggested waypoints_ | _814_ | _5_
-| _Suggested active waypoint, 12 following suggested waypoints_ | _877_ | _5_
-| _Suggested active waypoint, 13 following suggested waypoints_ | _940_ | _5_
-| _Suggested active waypoint, 14 following suggested waypoints_ | _1003_ | _5_
+| _Suggested active waypoint, 6 following suggested waypoints_ | 588 | 4
+| _Suggested active waypoint, 7 following suggested waypoints_ | 659 | 4
+| _Suggested active waypoint, 8 following suggested waypoints_ | _730_ | _4_
+| _Suggested active waypoint, 9 following suggested waypoints_ | _801_ | _4_
+| _Suggested active waypoint, 10 following suggested waypoints_ | _872_ | _5_
+| _Suggested active waypoint, 11 following suggested waypoints_ | _943_ | _5_
+| _Suggested active waypoint, 12 following suggested waypoints_ | _1014_ | _5_
 |===
 
 ====
@@ -1135,7 +1134,7 @@ Thus -- this particular case -- the checksum is 0x08 and thus the complete NMEA 
 |ASCII |American Standard Code for Interformation Interchange | A character encoding scheme used in computers, communications equipment, and other devices that use text, to represent text with numbers.
 |ETA |Estimated time of arrival |-
 |SOG |Speed over ground |Speed made good (often measured in knots).
-|TR |Turning circle radius| Turning circle radius (often measured in nautical miles).
+|TCR |Turn circle radius| Turning circle radius (often measured in nautical miles).
 |===
 
 [bibliography]
@@ -1145,7 +1144,7 @@ Thus -- this particular case -- the checksum is 0x08 and thus the complete NMEA 
 
 [[[AISSPEC5]]] "Recommendation ITU-R M.1371-5: Technical characteristics for an automatic identification system using time division multiple access in the VHF maritime mobile frequency band". February, 2014. International Telecommunications Union. Available from http://www.itu.int/rec/R-REC-M.1371-5-201402-I.
 
-[[[AISG289]]] "Guidance on the use of AIS application-specific messages". Published as SN.1/Circ.289 by the International Maritime Organization (IMO). June 2, 2010.
+[[[IMOSN289]]] "Guidance on the use of AIS application-specific messages". Published as SN.1/Circ.289 by the International Maritime Organization (IMO). June 2, 2010.
 
 [[[IALA144]]] "IALA Recommendation e-NAV - 144 On Harmonized implementation of Application Specific Messages (ASM)". Edition 1. June, 2011. International Association of Marine Aids to Navigation and Lighthouse Authorities.
 
