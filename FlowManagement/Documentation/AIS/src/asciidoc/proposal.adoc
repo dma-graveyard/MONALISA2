@@ -549,6 +549,12 @@ The test data pairs listed in this section are calculated (and can be validated)
 
 === Tactical voyageplan broadcast
 
+==== Variant 1: With no waypoints except the active waypoint
+
+==== Variant 2: With 1 waypoint plus the active waypoint
+
+==== Variant 3: With 16 waypoints plus the active waypoint
+
 === Tactical voyageplan broadcast, extended
 
 === Tactical voyageplan, inquiry
@@ -684,7 +690,7 @@ Intended route (broadcast)
 0 = default +
 3 = do not repeat anymore
 |Source ID |30 |MMSI number of source station.
-|Spare |1 |Not used. Set to zero.
+|Spare |2footnote:[<<ASM_219_01>> states 1 spare bit; but this is not compliant with the format of message type 8 in <<AISSPEC5>>, which states 2 spare bits. 2 spare bits is assumed to be correct.] |Not used. Set to zero.
 |IAI |16 |*DAC = 219; FI = 1*
 |ETA active WP | |The ETA at the active waypoint (first waypoint). For a cancellation of active route, the default values can be used.
 |UTC Month |4 |1 - 12 +
