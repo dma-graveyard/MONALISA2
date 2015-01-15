@@ -1,0 +1,70 @@
+namespace eu.monalisaproject;
+
+
+// tag::tvpendpoint[]
+// end::tvpendpoint[]
+
+message TacticalVoyagePlan {
+	1: text routeName;
+
+// Waypoints (In order)
+    2: list<Waypoint> waypoints;
+    
+// Schedules
+    3: list<Schedule> schedules;	
+};
+
+message Waypoint {
+
+    /** The waypoint ID. */
+    1: int waypointId;
+    
+    /** The position. */
+    2: position waypointPosition;
+
+    /** The rate of turn of the waypoint. In degrees */
+    // NBN: Not mandatory in spec, applied in AIS.
+    3: double rateOfTurn;
+
+    /** The turn radius of the vessel. In nautical miles. */
+    // NBN: Not mandatory in spec, not used in AIS, taken from ACCSEAS.
+    4: double turnRadius;
+    
+    /** Do not need for the first waypoint, i.e. specify leg TO waypoint */
+    // NBN: Not mandatory in spec, not used in AIS, taken from ACCSEAS
+    5: Leg leg;
+
+}
+
+message Leg {
+
+    /** Cross track starboard distance in meters. */
+    //NBN: Optional in spec, taken from ACCSEAS
+    1: double xtdStarboard;
+
+    /** Cross track port distance in meters. */
+    //NBN: Optional in spec, taken from ACCSEAS
+    2: double xtdPort;
+    
+    /** The geometry of the leg. Loxodrome=rhumb line(default), Orthodrome=great circle */
+    //NBN: Optional in spec, taken from ACCSEAS
+    3: GeometryType geometryType;
+}
+
+enum GeometryType {
+    LOXODROME = 1;
+    ORTHODROME = 2;
+}
+
+message Schedule {
+    /** The waypoint ID. */
+    1: int waypointId;
+    
+    /** The estimated time of arrival (UTC) at the waypoint position. */
+    2: timestamp eta;
+    
+    /** The speed over ground in knots. */
+    //NBN: Optional in spec, taken from ACCSEAS
+    3: double speed;
+    
+}

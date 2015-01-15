@@ -5,7 +5,7 @@ v0.1, January 6, 2015: First draft
 :toc-placement: preamble
 :icons: font
 :servicedir: ../../../../../Services/
-:msdlfile: {servicedir}/src/main/msdl/eu/monalisaproject/flowmanagement.msdl
+:msdlfiles: {servicedir}/src/main/msdl/eu/monalisaproject/
 
 Prepared by the http://dma.dk[Danish Maritime Authority] as part of the http://monalisaproject.eu/[MONA LISA 2] project.
 
@@ -194,7 +194,7 @@ action for the request.
 
 [source]
 ----
-include::{msdlfile}[tags=tvpendpoint]
+include::{msdlfiles}/tacticalVoyagePlanExchange.msdl[tags=tvpendpoint]
 ----
 
 The nature of the asynchronous endpoints allow an exchange of a tactical voyage plan from ship to ship as well as ship to shore. 
@@ -215,7 +215,7 @@ Two endpoint methods are defined for flow management suggestions. One method for
 
 [source]
 ----
-include::{msdlfile}[tags=flowendpoint]
+include::{msdlfiles}/flowManagementSuggestion.msdl[tags=flowendpoint]
 ----
 
 The asynchronous nature of the conversation allows the vessel to verify the suggestion before deciding upon further action. 
