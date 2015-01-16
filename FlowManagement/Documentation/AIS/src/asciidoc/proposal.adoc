@@ -61,7 +61,7 @@ For item 1 the term "good" means that collisions and dangerous situations are av
 
 Flow _management_ is based on knowledge of vessels' tactical voyageplans; i.e. announcements from each vessel regarding their intended manouvers in the immediate short-term future. When this knowledge is known either centrally at a coordinating center or distributed between nearby vessels, it is possible for a vessel to better understand the intentions of other nearby vessels and adjust own tactical route to achieve better flow, or for the coordination centre to suggest adjustments to tactical route, with the purpose of obtaining a "good" overall flow. This process is called _flow management_.
 
-If flow management takes place in a self-organizaing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- the risk of situations escalating to a level that require the application of collision avoidance regulations can be minimized.
+If flow management takes place in a self-organizing manner between vessels on a peer-to-peer basis it is called _autonomous flow management_. When a coordinating center is performing it the process is called _controlled flow management_. In a fully managed scenario -- whether autonomous or controlled -- the risk of situations escalating to a level that require the application of collision avoidance regulations can be minimized.
 
 ===== Tactical voyageplan
 In order to facilitate flow management vessels in the area must broadcast their tactical voyageplan and optionally basic information concerning their manouvering capabilities, such as turning radius.
@@ -99,7 +99,7 @@ As any coordinating organization the coordination centre is continuously receivi
 image::images/controlled_area.png[img-controlled-area, align="center"]
 
 ==== Autonomous flow management
-It has previously been observed in simulator trials, that given the information about the more detailed intentions of another vessel, and the ability to express own tactical plan to peer vessels, navigators quickly adapt to utilizing this mechanism, to clearly express own intention in a narrow passage situation.
+It has previously been observed in simulator trials, that given the information about the more detailed intentions of other vessels, and the ability to express own tactical plan to peer vessels, navigators quickly adapt to utilizing this mechanism, to clearly express own intention in a narrow passage situation.
 
 Autonomous flow management is thus anticipated to evolve out of the availability of information, that enable navigation systems to better predict realistic CPA and TCPA values and pinpoint likely critical passages at larger distances and longer timewindows, based on sharing the information on the tactical routes of peer vessels.
 
@@ -777,7 +777,7 @@ Values outside the range 0-59 are illegal and must not be used.
 |WP~_0_~, TCR |8 |Turn circle radius at the active waypoint. +
 Type: Integer. Unit: 1/100 of a nautical mile. +
 0 = no value +
-1 - 255 = turn circle radius of 0.01 nm - 2.55nm
+1 - 255 = turn circle radius of 0.01 nm - 2.55 nm
 |Following waypoints with ETA and TCR | n × 63 | Variable no. of planned waypoints and ETA's. +
 n ∈ {0..12} +
  See table 2
@@ -909,8 +909,6 @@ The message is only transmitted if the receiving vessel has previously broadcast
 This message can only be sent in response to a "Tactical voyageplan broadcast" or a "Tactical voyageplan broadcast, extended".
 
 The latitude and longitude of suggested active and planned waypoints must match exactly those received in the latest "Tactical voyageplan broadcast" or a "Tactical voyageplan broadcast, extended". If this is not the case, the vessel, to which the flow management suggestion is addressed, must disregard it, and broadcast a new tactical voyageplan message.
-
-If the flow management suggestion is sent in response to a "Tactical voyageplan broadcast" containing 15 or 16 waypoints, only the first 14 need to be included.
 
 *Transmission triggering events* +
 The following events must trigger a transmission of this message:
