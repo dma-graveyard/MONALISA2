@@ -14,6 +14,7 @@ image::images/eu.png[align="center"]
 [cols="1,2,4,4"]
 |===
 |v0.1 |16 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |1st draft for review.
+|v0.2 |xx JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |
 |===
 
 [abstract]
@@ -566,13 +567,139 @@ The test data pairs listed in this section are calculated (and can be validated)
 
 === Tactical voyageplan broadcast
 
-==== Variant 1: With no waypoints except the active waypoint
+==== Variant 1: Cancel route
+[cols="1,3"]
+|===
+|Parameter |Test value
 
-==== Variant 2: With 1 waypoint plus the active waypoint
+|Message ID |8
+|Repeat Indicator |0
+|Src ID |219000001
+|Spare |0
+.2+|IAI |DAC = 219
+|FI = 1
+.4+|ETA active WP |UTC month = 0
+|UTC day = 0
+|UTC hour = 0
+|UTC minute = 0
+|Duration |0
+|No. of waypoints| 0
+|===
 
-==== Variant 3: With 16 waypoints plus the active waypoint
+----
+!AIVDM,1,1,0,,83@ndh@nh@0000000,3*4B
+----
+
+==== Variant 1: With 4 waypoints
+
+[cols="1,3"]
+|===
+|Parameter |Test value
+
+|Message ID |8
+|Repeat Indicator |0
+|Src ID |219000001
+|Spare |0
+.2+|IAI |DAC = 219
+|FI = 1
+.4+|ETA active WP |UTC month = 1
+|UTC day = 16
+|UTC hour = 12
+|UTC minute = 29
+|Duration |30
+|No. of waypoints| 4
+.2+|WP~0~ |lon = 10.025599
+|lat = 55.846578
+.2+|WP~1~ |lon = 10.049975
+|lat = 55.828263
+.2+|WP~2~ |lon = 10.071840
+|lat = 55.811868
+.2+|WP~3~ |lon = 10.125227
+|lat = 55.796335
+|===
+
+----
+!AIVDM,1,1,0,,83@ndh@nhAPil01pP;NBwWwBVd5h2`CwSst2pJt1wgTA1Ldh0wnaDP,5*12
+----
 
 === Tactical voyageplan broadcast, extended
+
+==== Variant 1: Cancel tactical voyageplan
+
+[cols="1,3"]
+|===
+|Parameter |Test value
+
+|Message ID |8
+|Repeat Indicator |0
+|Src ID |219000001
+|Spare |0
+.2+|IAI |DAC = 219
+|FI = 4
+|===
+
+----
+!AIVDM,1,1,0,,83@ndh@ni0,4*0D
+----
+
+==== Variant 2: With active waypoints, no following waypoints
+
+[cols="1,3"]
+|===
+|Parameter |Test value
+
+|Message ID |8
+|Repeat Indicator |0
+|Src ID |219000001
+|Spare |0
+.2+|IAI |DAC = 219
+|FI = 4
+.2+|WP~_0_~, position |lon = 9.866598
+|lat = 55.856310
+.2+|WP~_0_~, ETA |UTC hour = 23
+|UTC minute = 59
+|WP~_0_~, TCR |255
+|===
+
+----
+!AIVDM,1,1,0,,83@ndh@ni0FUCG?vhWEvwt,2*5A
+----
+
+==== Variant 3: With 12 following waypoints
+
+[cols="1,3"]
+|===
+|Parameter |Test value
+
+|Message ID |8
+|Repeat Indicator |0
+|Src ID |219000001
+|Spare |0
+.2+|IAI |DAC = 219
+|FI = 4
+|WP~_0_~ |lon = 9.866598, lat = 55.856310, +
+hour = 23, minute = 59, +
+tcr = 255
+|WP~_1_~ |lon = 9.887884, lat = 55.854913, eta = 24, tcr = 127
+|WP~_2_~ |lon = 9.980881, lat = 55.844410, eta = 1, tcr = 127
+|WP~_3_~ |lon = 10.012982, lat = 55.846337, eta = 7, tcr = 127
+|WP~_4_~ |lon = 10.028260, lat = 55.846337, eta = 11, tcr = 127
+|WP~_5_~ |lon = 10.035126, lat = 55.833710, eta = 15, tcr = 127
+|WP~_6_~ |lon = 10.054009, lat = 55.826865, eta = 16, tcr = 127
+|WP~_7_~ |lon = 10.060876, lat = 55.816836, eta = 6, tcr = 127
+|WP~_8_~ |lon = 10.076668, lat = 55.809216, eta = 4, tcr = 127
+|WP~_9_~ |lon = 10.125077, lat = 55.796384, eta = 17, tcr = 127
+|WP~_10_~ |lon = 10.262749, lat = 55.781906, eta = 255, tcr = 127
+|WP~_11_~ |lon = 10.269788, lat = 55.776307, eta = 16, tcr = 127
+|WP~_12_~ |lon = 10.272706, lat = 55.762402, eta = 1, tcr = 127
+
+|===
+
+----
+!AIVDM,3,1,0,,83@ndh@ni0FUCG?vhWEvwt5b6fSwcg`<?p;K1HWwAEH1OhFrge?vTs@>wPequ,0*7D
+!AIVDM,3,2,0,,pOu9nPew1Kou@wqHQ1sv2p62awiho47t5hL;SwPUd3?p;R2HWvte`4OhG;:V?,0*27
+!AIVDM,3,3,0,,ubHhRwPfvbROrjn?uw1N1M4wm;L23v2t6E1w`DQ0Gt,2*1B
+----
 
 === Tactical voyageplan, inquiry
 
@@ -590,7 +717,7 @@ This message comes in just one variant.
 |Dest. ID |219019416
 |Retransmit Flag |0
 |Spare |0
-.2+|IAI |DAC = 291
+.2+|IAI |DAC = 219
 |FI = 5
 |Duration |240
 |===
