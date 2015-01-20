@@ -590,7 +590,7 @@ The test data pairs listed in this section are calculated (and can be validated)
 !AIVDM,1,1,0,,83@ndh@nh@0000000,3*4B
 ----
 
-==== Variant 1: With 4 waypoints
+==== Variant 2: With 4 waypoints
 
 [cols="1,3"]
 |===
@@ -798,7 +798,23 @@ A reference implementation of encoding and decoding of the flow management relat
 
 ==== Tactical voyageplan broadcast
 
+The reference implementation of the _tactical voyageplan broadcast_ message is located in
+
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/main/java/dk/dma/ais/message/binary/BroadcastIntendedRoute.java
+
+with an accompanying unit test class in
+
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/BroadcastIntendedRouteTest.java
+
 ==== Tactical voyageplan broadcast, extended
+
+The reference implementation of the _tactical voyageplan extended broadcast_ message is located in
+
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/main/java/dk/dma/ais/message/binary/TacticalVoyagePlan.java
+
+with an accompanying unit test class in
+
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/TacticalVoyagePlanTest.java
 
 ==== Tactical voyageplan, inquiry
 The reference implementation of the _tactical voyageplan, inquiry_ message is located in
@@ -807,9 +823,17 @@ The reference implementation of the _tactical voyageplan, inquiry_ message is lo
 
 with an accompanying unit test class in
 
-- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiryTest.java.
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/TacticalVoyagePlanInquiryTest.java
 
 ==== Flow management suggestion
+
+The reference implementation of the _flow management suggestion_ message is located in
+
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/main/java/dk/dma/ais/message/binary/FlowManagementSuggestion.java
+
+with an accompanying unit test class in
+
+- https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/FlowManagementSuggestionTest.java
 
 :numbered!:
 
