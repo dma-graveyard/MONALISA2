@@ -1,6 +1,6 @@
 = Message exchange for flow management in maritime traffic management systems.
 Thomas Borg Salling <tbsalling@tbsalling.dk>
-v0.1, January 16, 2015: 1st draft for review.
+v0.1, January 20, 2015: 1st draft for review.
 :keywords: imo, iala, ais, itu-r-1371, monalisa, ten-t
 :toc-placement: preamble
 :icons: font
@@ -13,7 +13,7 @@ image::images/eu.png[align="center"]
 
 [cols="1,2,4,4"]
 |===
-|v0.1 |16 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |1st draft for review.
+|v0.1 |20 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |1st draft for review.
 |v0.2 |xx JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |
 |===
 
@@ -692,7 +692,6 @@ tcr = 255
 |WP~_10_~ |lon = 10.262749, lat = 55.781906, eta = 255, tcr = 127
 |WP~_11_~ |lon = 10.269788, lat = 55.776307, eta = 16, tcr = 127
 |WP~_12_~ |lon = 10.272706, lat = 55.762402, eta = 1, tcr = 127
-
 |===
 
 ----
@@ -702,8 +701,6 @@ tcr = 255
 ----
 
 === Tactical voyageplan, inquiry
-
-This message comes in just one variant.
 
 ==== Variant 1: Inquiry with duration
 [cols="1,3"]
@@ -727,6 +724,70 @@ This message comes in just one variant.
 ----
 
 === Flow management suggestion
+
+==== Variant 1: With active waypoints, no following waypoints
+
+[cols="1,3"]
+|===
+|Parameter |Test value
+
+|Message ID |6
+|Repeat Indicator |0
+|Src ID |219000001
+|Seq no |0
+|Dest ID |219019416
+|Retransmit Flag |0
+|Spare |0
+.2+|IAI |DAC = 219
+|FI = 6
+.2+|WP~_0_~, position |lon = 9.866598
+|lat = 55.856310
+.2+|WP~_0_~, ETA |UTC hour = 23
+|UTC minute = 59
+|===
+
+----
+!AIVDM,1,1,0,,63@ndh@l=v9P=dH5aDmkwd9mOd,2*17
+----
+
+==== Variant 2: With 12 following waypoints
+
+[cols="1,3"]
+|===
+|Parameter |Test value
+
+|Message ID |6
+|Repeat Indicator |0
+|Src ID |219000001
+|Seq no |0
+|Dest ID |219019416
+|Retransmit Flag |0
+|Spare |0
+.2+|IAI |DAC = 219
+|FI = 6
+.2+|WP~_0_~, position |lon = 9.866598
+|lat = 55.856310
+.2+|WP~_0_~, ETA |UTC hour = 23
+|UTC minute = 59
+|WP~_1_~ |lon = 9.887884, lat = 55.854913, eta = 24
+|WP~_2_~ |lon = 9.980881, lat = 55.844410, eta = 1
+|WP~_3_~ |lon = 10.012982, lat = 55.846337, eta = 7
+|WP~_4_~ |lon = 10.028260, lat = 55.846337, eta = 11
+|WP~_5_~ |lon = 10.035126, lat = 55.833710, eta = 15
+|WP~_6_~ |lon = 10.054009, lat = 55.826865, eta = 16
+|WP~_7_~ |lon = 10.060876, lat = 55.816836, eta = 6
+|WP~_8_~ |lon = 10.076668, lat = 55.809216, eta = 4
+|WP~_9_~ |lon = 10.125077, lat = 55.796384, eta = 17
+|WP~_10_~ |lon = 10.262749, lat = 55.781906, eta = 255
+|WP~_11_~ |lon = 10.269788, lat = 55.776307, eta = 16
+|WP~_12_~ |lon = 10.272706, lat = 55.762402, eta = 1
+|===
+
+----
+!AIVDM,3,1,0,,63@ndh@l=v9P=dH5aDmkwd9mOd5b6fSwcg`<0ed5ROu5EP45fcsCwa>l3Pequ,0*52
+!AIVDM,3,2,0,,pOu9nPd5gOm3wUR47Pf1PbOtL=i05hL;SwPUd30f89ROsjnP@5jjaSwJV<8Pf,0*46
+!AIVDM,3,3,0,,vbROrjn?t5p5lCwDeh80g1U@Or58@4,2*0F
+----
 
 == Reference implementation
 
@@ -1065,8 +1126,10 @@ Waypoints are denoted WP~_0_~, WP~_1_~, WP~_i_~,..., WP~_n_~ and are navigated i
 1 = retransmitted.
 |Spare |1 |Not used. Set to zero.
 |IAI |16 |*DAC = 219; FI = 6*
-.2+|WP~_0_~, position |28 | Longitude in 1/10,000 min, ±180 degrees as per 2's complement (East = positive, West = negative).
->|27 <| Latitude in 1/10,000 min, ±90 degrees as per 2's complement (North = positive, South = negative).
+.2+|WP~_0_~, position |28 | Longitude in 1/10,000 min, +
+±180 degrees as per 2's complement (East = positive, West = negative).
+>|27 <| Latitude in 1/10,000 min, +
+±90 degrees as per 2's complement (North = positive, South = negative).
 .2+|WP~_0_~, ETA |5 |UTC hour +
 Integer value +
 Values outside the range 0-23 are illegal and must not be used. +
@@ -1074,16 +1137,13 @@ Values are current or future.
 >|6 <|UTC minute +
 Integer value +
 Values outside the range 0-59 are illegal and must not be used.
-|WP~_0_~, TCR |8 |Turn circle radius at the active waypoint. +
-Type: Integer. Unit: 1/100 of a nautical mile. +
-0 = no value +
-1 - 255 = turn circle radius of 0.01 nm - 2.55nm
-|Following waypoints with ETA and TCR | n × 63 | Variable no. of planned waypoints and ETA's. +
+|Suggested following waypoints with relative ETA | n × 63 | Variable no. of planned waypoints and ETA's. +
 n ∈ {0..12} +
-See table 2
-|*Total* | *162-1014* |
+See table "<<table_suggested_following_waypoints>>" below.
+|*Total* | *154-1006* |
 |===
 
+[[table_suggested_following_waypoints]]
 [cols="4,>2,12"]
 .Suggested following waypoints.
 |===
@@ -1095,11 +1155,7 @@ See table 2
 Integer value; [0-255]. +
 0 = Not used. Illegal value. +
 1 - 255 = Relative ETA measured in number of minutes from previous waypoint.
-|WP~_i_~, TCR |8 |Turn circle radius at WP~_i_~. +
-Type: Integer. Unit: 1/100 of a nautical mile. +
-0 = no value +
-1 - 255 = turn circle radius of 0.01 nm - 2.55nm
-|*Total* |*71* |
+|*Total* |*63* |
 |===
 
 [cols="8,>2,>2"]
@@ -1107,20 +1163,20 @@ Type: Integer. Unit: 1/100 of a nautical mile. +
 |===
 |Payload | Bits | Slots
 
-|Suggested active waypoint, no following suggested waypoints | 162 | 2
-|Suggested active waypoint, 1 following suggested waypoint | 233 | 2
-|Suggested active waypoint, 2 following suggested waypoints | 304 | 2
-|Suggested active waypoint, 3 following suggested waypoints | 375 | 3
-|Suggested active waypoint, 4 following suggested waypoints | 446 | 3
-|Suggested active waypoint, 5 following suggested waypoints | 517 | 3
+|Suggested active waypoint, no following suggested waypoints | 154 | 2
+|Suggested active waypoint, 1 following suggested waypoint | 217 | 2
+|Suggested active waypoint, 2 following suggested waypoints | 280 | 2
+|Suggested active waypoint, 3 following suggested waypoints | 343 | 2
+|Suggested active waypoint, 4 following suggested waypoints | 406 | 3
+|Suggested active waypoint, 5 following suggested waypoints | 469 | 3
+| Suggested active waypoint, 6 following suggested waypoints | 532 | 3
 3+^.^|_Transmitting more than 3 slots is not recommended_
-| _Suggested active waypoint, 6 following suggested waypoints_ | 588 | 4
-| _Suggested active waypoint, 7 following suggested waypoints_ | 659 | 4
-| _Suggested active waypoint, 8 following suggested waypoints_ | _730_ | _4_
-| _Suggested active waypoint, 9 following suggested waypoints_ | _801_ | _4_
-| _Suggested active waypoint, 10 following suggested waypoints_ | _872_ | _5_
-| _Suggested active waypoint, 11 following suggested waypoints_ | _943_ | _5_
-| _Suggested active waypoint, 12 following suggested waypoints_ | _1014_ | _5_
+| _Suggested active waypoint, 7 following suggested waypoints_ | 595 | 4
+| _Suggested active waypoint, 8 following suggested waypoints_ | _658_ | _4_
+| _Suggested active waypoint, 9 following suggested waypoints_ | _721_ | _4_
+| _Suggested active waypoint, 10 following suggested waypoints_ | _784_ | _4_
+| _Suggested active waypoint, 11 following suggested waypoints_ | _847_ | _5_
+| _Suggested active waypoint, 12 following suggested waypoints_ | _910_ | _5_
 |===
 
 ====
