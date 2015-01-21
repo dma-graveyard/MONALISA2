@@ -7,10 +7,11 @@ namespace eu.monalisaproject;
 message TacticalVoyagePlan {
 	1: text routeName;
 
-// Waypoints (In order)
+    // Waypoints 
+    // NBN: (In order? or just Schedules)
     2: list<Waypoint> waypoints;
     
-// Schedules
+    // Schedules
     3: list<Schedule> schedules;	
 };
 
@@ -22,17 +23,13 @@ message Waypoint {
     /** The position. */
     2: position waypointPosition;
 
-    /** The rate of turn of the waypoint. In degrees */
-    // NBN: Not mandatory in spec, applied in AIS.
-    3: double rateOfTurn;
-
     /** The turn radius of the vessel. In nautical miles. */
-    // NBN: Not mandatory in spec, not used in AIS, taken from ACCSEAS.
-    4: double turnRadius;
+    // NBN: Not mandatory in spec, not used in AIS.
+    3: double turnRadius;
     
-    /** Do not need for the first waypoint, i.e. specify leg TO waypoint */
-    // NBN: Not mandatory in spec, not used in AIS, taken from ACCSEAS
-    5: Leg leg;
+    /** Do not need for the first waypoint, i.e. specify leg TOWARDS this waypoint, i.e. INBOUND leg */
+    // NBN: Not mandatory in spec, not used in AIS.
+    4: Leg leg;
 
 }
 
@@ -49,6 +46,7 @@ message Leg {
     /** The geometry of the leg. Loxodrome=rhumb line(default), Orthodrome=great circle */
     //NBN: Optional in spec, taken from ACCSEAS
     3: GeometryType geometryType;
+    
 }
 
 enum GeometryType {
@@ -56,15 +54,29 @@ enum GeometryType {
     ORTHODROME = 2;
 }
 
+enum ScheduleType {
+    MANUAL = 1;
+    CALCULATED = 2;
+}
+
 message Schedule {
     /** The waypoint ID. */
-    1: int waypointId;
+    1: int waypointFrom;
     
-    /** The estimated time of arrival (UTC) at the waypoint position. */
-    2: timestamp eta;
+    /** The waypoint ID. */
+    2: int waypointTo;
+    
+    /** Calculated or Manual */
+    3: ScheduleType scheduleType;
+    
+    /** The estimated time of departure (UTC) from the departing waypoint position. */
+    4: timestamp etd;
+
+    /** The estimated time of arrival (UTC) at the upcoming waypoint position. */
+    5: timestamp eta;
     
     /** The speed over ground in knots. */
     //NBN: Optional in spec, taken from ACCSEAS
-    3: double speed;
-    
+    6: double speed;
+            
 }
