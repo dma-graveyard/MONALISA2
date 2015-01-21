@@ -1,21 +1,43 @@
 namespace eu.monalisaproject;
 
 
+//tag::flowRequest[]
 message FlowManagementSuggestionRequest {
-	/* 
+	/** 
 	  Conversation ID of the request. 
 	  A unique identifier which must be used in the response message.
 	 */
 	1: int64 requestId;
+	
+	/** The tactical voyage plan to suggest. */
+	2: TacticalVoyagePlan suggestedVoyagePlan;
+	
+	/** Text message included */
+	3: text textMessage;		
+}
+//end::flowRequest[]
+
+//tag::flowResponse[]
+enum FlowManagementSuggestionStatus {
+  PENDING = 1;
+  ACCEPTED = 2;
+  REJECTED = 3;
 }
 
 message FlowManagementSuggestionResponse {
-	/* 
+	/** 
 	  Conversation ID of the request. 
 	  ID of the request to which we are responding.
 	*/
 	1: int64 requestId;
+	
+	/** The answer status */
+	2: FlowManagementSuggestionStatus status;
+	
+	/** Reply Text message */
+	3: text replyText;
 }
+//end::flowResponse[]
 
 
 /**
@@ -33,12 +55,13 @@ message FlowManagementSuggestionResponse {
 */
 // tag::flowendpoint[]
 endpoint FlowManagementSuggestionEndpoint {
-
-   void flowManagementSuggestion(
+   void submitSuggestion(
      1: FlowManagementSuggestionRequest request
    );
+}
 
-   void flowManagementSuggestionResponse(
+endpoint FlowManagementResponseEndpoint {
+   void postResponse(
      1: FlowManagementSuggestionResponse response
    );
    

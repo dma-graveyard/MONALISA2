@@ -180,32 +180,49 @@ The request specifies the time interval of the tactical voyage plan as a configu
 
 Communication in MMS is specified through endpoint and broadcasts. In order to support the use cases, there is currently no particular need for broadcast, so this chapter outlines the endpoint definitions as well as the message formats.
 
-Details of the service definitions is described in the Maritime Cloud Developer Guide, which is published online [[MARCLOUDDEV]].
+Details of the service definitions is described in the Maritime Cloud Developer Guide, which is published online <<MARCLOUDDEV>>.
 
 === STCC endpoint
 
 ==== Tactical Voyage Plan Exchange
 
-Two endpoint methods are defined in an exchange of a tactical voyage plan.
-One endpoint method for requesting a tactical voyage plan and one endpoint for the response.
+One endpoint method is defined for an exchange of a tactical voyage plan.
 
-Such a response may be generated automatically and synchronous, however allowing the response to be sent asynchronously allow the OOW to decide on the best course of
-action for the request.
+[[img-tvp-exchange]]
+.Requesting a Tactical Voyage Plan through defined endpoint.
+image::images/endpoint-tvp.png[img-tvp-exchange, align="center"]
+
+STCC, a ship or another entity may request a tactical voyage plan from the endpoint. The request must specify the amount of minutes into the near future for the voyage plan.
+
+The ship responds with the tactical voyage plan or rejects if it cannot comply.
+
+====
+Q? 
+
+* Should zero or negative timeWindow cause rejection or empty response or even default response? 
+* Is there a max time window to not call it tactical anymore?  
+* Can the ship just return a shorter timespan if it does not have/want to publish more?
+====
+
+In MSDL the endpoint definition should look like this:
 
 [source]
+.Endpoint definition in MSDL
 ----
 include::{msdlfiles}/tacticalVoyagePlanExchange.msdl[tags=tvpendpoint]
+
+include::{msdlfiles}/tacticalVoyagePlanExchange.msdl[tags=tvpresponse]
 ----
 
-The nature of the asynchronous endpoints allow an exchange of a tactical voyage plan from ship to ship as well as ship to shore. 
+The response include a tactical voyage plan and a message for any explanation.
 
-// Provide an illustration?
+====
+Q?
 
-In a single ship to shore scenario the ship is expected to implement the behaviour behind a request method and the shore is expected to implement the behaviour behind the response method. 
-
-In a ship to ship scenario ships can request a tactical voyage plan from other ships and would need to implement the reponse method as well.
-
-A shore station cannot logically emit tactical voyage plan and may ignore a request or simply provide an empty response.
+* What's the best way to signal errors or non-comply or limited-comply or other..?
+* Should we include a response type (ACCEPT | REJECT | something...)
+* Should we provide a unique identification of a tactical voyage plan (like a UUID, in case where we need to reference this specific tvp again)?
+====
 
 
 
@@ -213,15 +230,41 @@ A shore station cannot logically emit tactical voyage plan and may ignore a requ
 
 Two endpoint methods are defined for flow management suggestions. One method for posting the suggestion and another endpoint method for the response.
 
-[source]
-----
-include::{msdlfiles}/flowManagementSuggestion.msdl[tags=flowendpoint]
-----
+[[img-flow-suggest]]
+.Suggesting a Tactical Voyage Plan through defined endpoint.
+image::images/endpoint-flow.png[img-flow-suggest, align="center"]
+
 
 The asynchronous nature of the conversation allows the vessel to verify the suggestion before deciding upon further action. 
 
 Similar to the tactical voyage plan exchange the interaction can be ship to ship and ship to shore. The ship to ship scenario would enable Autonomous flow management.
 
+The endpoints will be defined in MSDL like this:
+[source]
+.Endpoint definition in MSDL
+----
+include::{msdlfiles}/flowManagementSuggestion.msdl[tags=flowendpoint]
+----
+
+The request and response are both of particular types containing relevant information about the request and response.
+
+[source]
+----
+include::{msdlfiles}/flowManagementSuggestion.msdl[tags=flowRequest]
+----
+
+When a suggestion is submitted it contains apart from the tactical voyage plan a transaction identifier for parties to identify this particular request at a later time. The same identifier will be used in responses but also in case of re-transmission.
+
+The request also includes an optional message for the ship to understand the reason behind the suggestion.
+
+[source]
+----
+include::{msdlfiles}/flowManagementSuggestion.msdl[tags=flowResponse]
+----
+
+The response include the original transaction identifier from the request. It also includes a status of the suggestion request, most particularly if the request has been accepted or rejected.
+
+The return status of _PENDING_ can be used as an intermediate response in cases where a decision has not been met yet. The ship can implement an automated response with _status=PENDING_ at regular intervals.
 
 
 [glossary]
