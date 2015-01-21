@@ -182,7 +182,7 @@ Communication in MMS is specified through endpoint and broadcasts. In order to s
 
 Details of the service definitions is described in the Maritime Cloud Developer Guide, which is published online <<MARCLOUDDEV>>.
 
-=== STCC endpoint
+=== MMS endpoints
 
 ==== Tactical Voyage Plan Exchange
 
@@ -266,6 +266,67 @@ The response include the original transaction identifier from the request. It al
 
 The return status of _PENDING_ can be used as an intermediate response in cases where a decision has not been met yet. The ship can implement an automated response with _status=PENDING_ at regular intervals.
 
+
+==== Tactical Voyage Plan
+
+The tactical voyage plan is a subset of the Dynamic Voyage Plan and contain route geometry and the near schedule.
+
+It is based on the defined format in <<ARCH>> - Appendix A, however, some optional fields have been omitted for the tactical scenario.
+
+A tactical voyage plan is returned by a ship when requested, but is also used for flow management suggestions. In the latter case the tactical voyage plan should be structural identical to the tactical voyage plan requested, but will differ only in the change content, such as waypoint position, speed, etd, eta, etc. 
+
+[source]
+----
+include::{msdlfiles}/tacticalVoyagePlan.msdl[tags=tvpmessage]
+----
+
+Each tactical voyage plan have a route name which is mandatory in the Dynamic Voyage Plan. Otherwise the message contains the route geometry as a list of waypoints and a schedule.
+
+The waypoints should be represented in order with the active waypoint as the first waypoint in the list.
+
+The schedule information defines the current schedule between endpoints and is sorted by time.
+
+
+===== Waypoint definition
+
+Each waypoint contains the following definition
+
+[source]
+----
+include::{msdlfiles}/tacticalVoyagePlan.msdl[tags=tvpwaypoint]
+----
+
+The waypoint ID refer to the waypoint ID from the Dynamic Voyage Plan. Each waypoint have a given position and a turn radius, when part of a direction change.
+
+All but the first waypoint should have a leg definition of the inbound leg.
+
+===== Leg definition
+
+Each leg contains the following definition
+
+[source]
+----
+include::{msdlfiles}/tacticalVoyagePlan.msdl[tags=tvpleg]
+----
+
+Each leg define the cross track distance in meters for starboard and port as well as the geometry type of the leg. Default geometry type is loxodrome.
+
+===== Schedule definition
+
+Each schedule contains the following definition
+
+[source]
+----
+include::{msdlfiles}/tacticalVoyagePlan.msdl[tags=tvpschedule]
+----
+
+Each schedule element contains a reference to the departing waypoint and the arriving waypoint, matching the identifier in the waypoint list.
+
+Schedules are defined in time order, which means that the calculated and the manual schedule elements of the Dynamic Voyage Plan is merged into one with a subsequent schedule type attached.
+
+The schedule contains an ETD of the departing waypoint as well as an ETA of the arriving waypoint. When there is no significant stop-over at a waypoint the ETD may be omitted and merely substituted by the ETA of the previous schedule.
+
+The schedule element also contains the speed over ground in knots as an easy indication of - but no substitution for - the arrival at the upcoming waypoint.
 
 [glossary]
 == Glossary

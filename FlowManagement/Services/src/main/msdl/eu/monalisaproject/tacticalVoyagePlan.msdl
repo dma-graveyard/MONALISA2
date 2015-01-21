@@ -1,20 +1,19 @@
 namespace eu.monalisaproject;
 
 
-// tag::tvpendpoint[]
-// end::tvpendpoint[]
-
+// tag::tvpmessage[]
 message TacticalVoyagePlan {
 	1: text routeName;
 
     // Waypoints 
-    // NBN: (In order? or just Schedules)
     2: list<Waypoint> waypoints;
     
     // Schedules
     3: list<Schedule> schedules;	
 };
+// end::tvpmessage[]
 
+// tag::tvpwaypoint[]
 message Waypoint {
 
     /** The waypoint ID. */
@@ -32,7 +31,9 @@ message Waypoint {
     4: Leg leg;
 
 }
+// end::tvpwaypoint[]
 
+// tag::tvpleg[]
 message Leg {
 
     /** Cross track starboard distance in meters. */
@@ -53,7 +54,9 @@ enum GeometryType {
     LOXODROME = 1;
     ORTHODROME = 2;
 }
+// end::tvpleg[]
 
+// tag::tvpschedule[]
 enum ScheduleType {
     MANUAL = 1;
     CALCULATED = 2;
@@ -77,6 +80,6 @@ message Schedule {
     
     /** The speed over ground in knots. */
     //NBN: Optional in spec, taken from ACCSEAS
-    6: double speed;
-            
+    6: double speed;            
 }
+// tag::tvpschedule[]
