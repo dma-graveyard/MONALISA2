@@ -123,16 +123,17 @@ Design criteria and specific design proposals will be described for messages  an
 | No. | Event | Action
 
 | {counter:step} | The coordination centre detects, that a vessel has entered the controlled area. | The control centre transmits an addressed message to the vessel requesting it broadcast tactical voyageplans.footnote:[This is done even if the coordination centre already has this information in order to distribute this information to other vessels in the area.]
-| {counter:step} | The vessel receives the message. | The vessel responds by broadcasting message, which contains its tactical voyageplans.
+| {counter:step} | The vessel receives the message. | The vessel responds by broadcasting a message containing its tactical voyageplan.
 .2+| {counter:step} | The broadcast is received by the coordination centre (and likely some of the other vessels in the area). | The control centre recalculates optimal speeds per vessel.footnote:[with priority to suggest speed changes for V~0~ over other vessels, and fewest possible other vessels, and only for vessels intending to leave A.]
 | *Exception:* The broadcast is never received by the coordination centre. | The coordination centre retransmits its message to the vessel.
 | {counter:step} | The coordination centre's recalculation of optimal speeds completes. | The coordination centre transmits an addressed messages with flow management suggestion s to those vessels which (according to the calculation) require changes.
-.2+| {counter:step} | A vessel receives its flow management suggestion  from the coordination centre. | The navigator is alerted.
+.2+| {counter:step} | A vessel receives its flow management suggestion from the coordination centre. | The navigator is alerted.
 | *Exception:* The flow management suggestion is never received by the vessel. | _May lead to special case: Coordination centre discovers new suggestions needed._
 | {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
 |===
 
-=== Use case: Coordination centre determintes new flow management suggestion s needed
+[[use_case_cc_emits_fmm]]
+=== Use case: Coordination centre determines new flow management suggestion s needed
 
 {set:step:0}
 [cols="1,5,5"]
@@ -147,16 +148,50 @@ Design criteria and specific design proposals will be described for messages  an
 | {counter:step} | Navigator of approves flow management suggestion . | The vessel broadcasts a message containing its new tactical voyageplan.
 |===
 
-=== Use case: Vessel broadcasts its tactical voyageplan
+[[use_case_vessel_emits_tvp]]
+=== Use case: Vessel autonomously broadcasts its tactical voyageplan
 
-=== Use case: Vessel changes or resends its tactical voyageplan
+{set:step:0}
+[cols="1,5,5"]
+.Use case.
+|===
+| No. | Event | Action
+
+| {counter:step} | Due to some event (examples: A recurring period expiring, a change to the current tactical voyageplan or expiration of a previously broadcasted tactical voyageplan) a vessel decides to broadcast its tactical voyageplan. | The vessel broadcasts a message containing its tactical voyageplan.
+.2+| {counter:step} | Other vessels receive the message. | The receiving vessel(s) may decide to change their intended manouvers based on knowledge of the transmitting vessels tactical voyageplan.
+|A coordination center receives the message.
+| The coordination center engages into <<use_case_cc_emits_fmm>>.
+|===
 
 === Use case: Vessel cancels its tactical voyageplan
 
-=== Use case: A tactical voyageplan expires
+{set:step:0}
+[cols="1,5,5"]
+.Use case.
+|===
+| No. | Event | Action
 
-=== Use case: Receivers of a vessel's tactical voyageplan have different versions
-(in case of e.g. transmission ok, reception bad).
+| {counter:step} | The navigator of a vessel decides to cancel a previously broadcasted tactical voyageplan. | The vessel broadcasts a message containing cancellation of tactical voyageplan.
+.2+| {counter:step} | Other vessels receive the message. | The receiving vessel(s) may decide to change their intended manouvers based on knowledge of the transmitting vessels tactical voyageplan. They may engage into <<use_case_vessel_emits_tvp>>.
+|A coordination center receives the message.
+| The coordination center engages into <<use_case_cc_emits_fmm>>.
+|===
+
+=== Use case: A vessel inquiries about the tactical voyageplan of another vessel
+
+{set:step:0}
+[cols="1,5,5"]
+.Use case.
+|===
+| No. | Event | Action
+
+| {counter:step} | The navigator of a vessel, V~_L_~, determines, that either
+a) has he never received the tactical voyageplan of another vessel footnote:[This could happen in case of e.g. radio conditions in an area being so that _some_ (but not all) vessels fail to receive broadcasts from some other vessels.], V~_R_~, or b) the observed manouvers of V~_R_~ deviate from the last received tactical voaygeplan from V~_R_~ | The navigator of V~_L_~ orders transmission of a voyageplan inquiry addressed to V~_R_~.
+| {counter:step} | V~_R_~ receives the message. | Automatically - or based on navigator actions - V~_R_~ broadcasts a message carrying its tactical voyageplan.
+.2+| {counter:step} | Other vessels, including V~_L_~, receive the message. | The receiving vessel(s) may decide to change their intended manouvers based on knowledge of the transmitting vessels tactical voyageplan. They may engage into <<use_case_vessel_emits_tvp>>.
+|A coordination center receives the message.
+| The coordination center engages into <<use_case_cc_emits_fmm>>.
+|===
 
 == Design criteria
 Messaging in the maritime domain has been available many years and communication standards have evolved and been added and augmented several times to accomodate the increasing demand for handling more and more complex scenarios in the maritime domain.
