@@ -17,7 +17,7 @@ message FlowManagementSuggestionRequest {
 }
 //end::flowRequest[]
 
-//tag:flowResponse[]
+//tag::flowResponse[]
 enum FlowManagementSuggestionStatus {
   PENDING = 1;
   ACCEPTED = 2;
