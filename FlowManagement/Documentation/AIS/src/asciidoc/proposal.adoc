@@ -1,6 +1,6 @@
 = Message exchange for flow management in maritime traffic management systems.
 Thomas Borg Salling <tbsalling@tbsalling.dk>
-v0.1, January 20, 2015: 1st draft for review.
+v0.1+, January 22, 2015: 2nd draft for review.
 :keywords: imo, iala, ais, itu-r-1371, monalisa, ten-t
 :toc-placement: preamble
 :icons: font
@@ -14,7 +14,7 @@ image::images/eu.png[align="center"]
 [cols="1,2,4,4"]
 |===
 |v0.1 |20 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |1st draft for review.
-|v0.2 |xx JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |
+|v0.1+ |22 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |-
 |===
 
 [abstract]
@@ -251,7 +251,7 @@ When utilizing AIS, anyone can spoof the identity of a ship and interact with ot
 It is important to a navigator or STCC to be able to determine the security level of the information provided.
 
 ====
-This shall be achived by designin the user interface of the receiving party to indicate the level of trust that can be associated with the sender.
+This shall be achived by designing the user interface of the receiving party to indicate the level of trust that can be associated with the sender.
 ====
 
 === AIS-specific design criteria
@@ -567,41 +567,63 @@ Appendix: <<tactical_voyageplan_broadcast>>
 
 [[design_validation]]
 == Validation against design criteria
+In this section the proposed messages are validated against the defined design criteria.
 
-=== General design criteria
-[cols="1,5,5"]
+The validation is
+
+- a textual description of how the design criteria was met
+- quantitied as a score from 0 to 2, where 0 means no compliance with the criteria, 1 means partial compliance, and 2 means full compliance.
+
+=== Validation of AIS messages against design criteria
+
+==== General design criteria
+{set:step:0}
+[cols="1,3,7,>1"]
 |===
-| No. | Criteria | Validation
+| No. | Criteria | Validation | Score
 
-| 1 | Design with the end-user in mind | -
-| 2| Design for multivendor environment | -
-| 3| Information transfer involving ships must be bandwidth efficient | -
-| 4| Ship-shore interactions must be robust | -
-| 5| Ship-shore data IP connections must be initiated from ship | -
+| {counter:step} | Design with the end-user in mind | Message flow is deducted from use cases. Actor involvement is analysed. | 2
+| {counter:step} | Design for multivendor environment | There are no vendor-specific issues in the proposed message formats. The proposed message formats are open and available for all vendors to implement. | 2
+| {counter:step} | Information transfer involving ships must be bandwidth efficient | The proposed messages can be long; and for AIS they involve up to 5 time slots. The potential to shorten messages is to eliminate data fields (which is hard) or to introduce compression (which breaks other design criteria). | 1
+| {counter:step} | Ship-shore interactions must be robust | No state is required in the messaging; any party can query a vessel's intentions. There is no guarantee of message arrival. | 1
+| {counter:step} | [line-through]#Ship-shore data IP connections must be initiated from ship# | For AIS IP communication is not applicable. | [line-through]#0#
+| {counter:step} | Indication of trust | No trust is designed into AIS | 0
+|
 |===
 
-=== AIS-specific design criteria
-[cols="1,5,5"]
-|===
-| No. | Criteria | Validation
+The total theoretical score is 2 × 5 = 10; the obtained score is 6. +
+*The design criteria compliance against general design criteria is 60%*.
 
-| 1 | Consider updated definitions of ASM and related guidance, before developing new ASM | -
-| 2| Contribute to the IALA AIS ASM collection | -
-| 3| Low transmission frequency | -
-| 4| Use 6-bit ASCII | -
-| 5| Fixed length messages | -
-| 6| Fixed bit-offset for fields | -
-| 7| Variable fields last | -
-| 8| One dispatch field | -
-| 9| Minimum no. of datatypes | -
-| 10| Single point of truth | -
-| 11| Support stream-based parsers | -
-| 12| Don't split data fields across datagrams | -
-| 13| Check design using ASN.1 | -
-| 14| Provide a reference implementation | -
-| 15| Provide test data sets for all message variants | -
+==== AIS-specific design criteria
 
+{set:step:0}
+[cols="1,3,7,>1"]
 |===
+| No. | Criteria | Validation | Score
+
+| {counter:step} | Consider updated definitions of ASM and related guidance, before developing new ASM | Relevant specifications and <<ASMCOLL>> was searched for candididate messages, which were evaluated. | 2
+| {counter:step} | Contribute to the IALA AIS ASM collection | After internal review the proposed AIS messages will be submitted to IALA for inclusion in <<ASMCOLL>> | 2
+| {counter:step} | Low transmission frequency | The minimal no. of events to trigger tranmission of messages have been identified and described per message. | 2
+| {counter:step} | Limit no. of VHF transmission slots | It is possible to send all proposed messages in 3 slots or fewer. But some messages support transmission of up to 5 slots. | 1
+| {counter:step} | [line-through]#Use 6-bit ASCII# | There is no text in any of the proposed messages. | [line-through]#0#
+| {counter:step} | Fixed length messages | Some, but not all, of the proposed AIS messages have fixed-length. Variable-length messages is proposed to minimize the required no. of transmission slots. | 1
+| {counter:step} | Fixed bit-offset for fields | All the proposed messages have fixed bit-offsets for all fields. | 2
+| {counter:step} | Variable fields last | There are no variable-length fields in any of the proposed messages; unless the variable set of waypoints is seen as one variable-length field. And that fields is placed last. | 2
+| {counter:step} | [line-through]#One dispatch field# | There are no dispatch-fields in any of the proposed AIS messages. | [line-through]#0#
+| {counter:step} | Minimum no. of datatypes | No new data types are introduced. Existing data types are reused. | 2
+| {counter:step} | Single point of truth | There are no redundant data fields in the proposed messages. For instance there is no field to indicate no. of following waypoints - that information is derived from message length. | 2
+| {counter:step} | Support stream-based parsers | Stream-based parsing is fully supported. | 2
+| {counter:step} | Don't split data fields across datagrams | No data fields in the proposed AIS messages are split across multiple datagrams. | 0
+| {counter:step} | Check design using ASN.1 | The propopsed AIS messages still remain to be expressed in ASN.1 notation | 0
+| {counter:step} | Provide a reference implementation | A full reference implementation for all proposed AIS messages is available. | 2
+| {counter:step} | Provide test data sets for all message variants | Test data sets for all identied message variants are provided. They are listed in this paper and included in unit tests in the reference implementation. | 2
+|===
+
+The total theoretical score is 2 × (16-2) = 28; the obtained score is 22. +
+*The design criteria compliance against AIS-specific design criteria is 79%*.
+
+=== Validation of MSDL messages against design criteria
+...
 
 == Test data
 The test data pairs listed in this section are calculated (and can be validated) as described in the appendix: <<compute_test_data_pairs>>.
@@ -1422,5 +1444,7 @@ Thus -- this particular case -- the checksum is 0x08 and thus the complete NMEA 
 [[[ASM_219_01]]] "Specification of intended route - (broadcast)". Specification of the AIS application specific message for intended route broadcast. http://www.e-navigation.nl/content/intended-route.
 
 [[[ASM_219_02]]] "Specification of route suggestion". Specification of the AIS application specific message for intended route broadcast. http://www.e-navigation.nl/content/route-suggestion.
+
+[[[REFIMPL]]] "DMA AisLib - Java library for handling AIS messages". A full AIS message encoder and decoder library in Java -- including a reference implementation of all messages proposed in <<ais_message_definitions>>. https://github.com/tbsalling/AisLib/tree/flow-management.
 
 [[[SBTCD]]] Blog entry on "Turning Circle Diameter for a Container Ship". http://shipsbusiness.com/turning-circle.html.
