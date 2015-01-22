@@ -19,7 +19,13 @@ image::images/eu.png[align="center"]
 
 [abstract]
 == Abstract
-...
+This paper introduces the concept of _flow management_ in relation to traffic coordination and management in the maritime world. It defines the need for message exchange between vessels and shore-based coordination centers to accomplish optimal flow of vessels in narrow waters.
+
+Existing message types in communication via the AIS and Maritime Cloud protocols are examined to be reused for the purpose, and where these are found inadequate new message types are proposed.
+
+In order to take advantage of previous lessons learned, literature on the subject is studied and a number of design criteria for new messages are extracted. All proposed new message types are validated against these design criteria.
+
+The paper is concluded by a complete set of detailed proposed message specifications to support flow management.
 
 :numbered:
 
