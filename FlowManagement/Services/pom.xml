@@ -21,7 +21,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
-		<msdl.version>0.2.2</msdl.version>
+		<msdl.version>0.3-SNAPSHOT</msdl.version>
 		<java.version>1.8</java.version>
 	</properties>
 
