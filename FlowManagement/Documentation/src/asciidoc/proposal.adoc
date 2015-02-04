@@ -1,10 +1,10 @@
 = Message exchange for flow management in maritime traffic management systems.
 Thomas Borg Salling <tbsalling@tbsalling.dk>
-v0.1+, January 22, 2015: 2nd draft for review.
+v0.2, February 4, 2015: 2nd draft for review.
 :keywords: imo, iala, ais, itu-r-1371, monalisa, ten-t
 :toc-placement: preamble
 :icons: font
-:servicedir: ../Services/
+:servicedir: ../../../Services/
 :msdlfiles: {servicedir}/src/main/msdl/eu/monalisaproject/
 
 
@@ -150,6 +150,7 @@ Design criteria and specific design proposals will be described for messages  an
 Given the transmission media there are two sets of use cases depending on the choice of either AIS or MMS based messaging
 
 {set:case:1}
+
 === Use case (AIS-{counter:case}): Vessel enters the controlled area
 
 {set:step:0}
@@ -230,6 +231,7 @@ a) has he never received the tactical voyageplan of another vessel footnote:[Thi
 |===
 
 {set:case:1}
+
 === Use case (MMS-{counter:case}): Requesting a tactical voyage plan
 
 {set:step:0}
@@ -1137,6 +1139,33 @@ The reference implementation of the _flow management suggestion_ message is loca
 with an accompanying unit test class in
 
 - https://github.com/tbsalling/AisLib/blob/flow-management/ais-lib-messages/src/test/java/dk/dma/ais/message/binary/FlowManagementSuggestionTest.java
+
+=== MMS
+A reference of the MMS components is available in:
+
+- https://github.com/dma-dk/MONALISA2.
+
+==== MSDL specification
+
+The reference implementation of the _flow management suggestion_ and _tactical voyageplan exchange_ is available in 
+
+- https://github.com/dma-dk/MONALISA2/tree/master/FlowManagement/Services
+
+==== EPD Reference implementation
+
+A reference implementation of the MMS components is available in
+
+- https://github.com/dma-dk/MONALISA2/tree/master/FlowManagement/EPD
+
+Which is a plugin component for the e-Navigation Prototype Displays (EPD) located here:
+
+- https://github.com/dma-enav/EPD
+
+====
+  * The Components should probably be moved to another repository, which is public
+  * The EPD Reference implementation is not finalized
+====
+
 
 :numbered!:
 
