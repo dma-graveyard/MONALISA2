@@ -4,6 +4,9 @@ v0.1+, January 22, 2015: 2nd draft for review.
 :keywords: imo, iala, ais, itu-r-1371, monalisa, ten-t
 :toc-placement: preamble
 :icons: font
+:servicedir: ../Services/
+:msdlfiles: {servicedir}/src/main/msdl/eu/monalisaproject/
+
 
 Prepared by the http://dma.dk[Danish Maritime Authority] as part of the http://monalisaproject.eu/[MONA LISA 2] project.
 
@@ -15,6 +18,7 @@ image::images/eu.png[align="center"]
 |===
 |v0.1 |20 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |1st draft for review.
 |v0.1+ |22 JAN 2015 |Thomas Borg Salling <tbsalling@tbsalling.dk> |-
+|v0.2 |04 FEB 2015 |Niels Bech Nielsen <nbn@logical.dk> | Added Maritime Cloud Components
 |===
 
 [abstract]
@@ -34,7 +38,7 @@ As part of -- and as a contribution to -- the MONA LISA 2.0 <<MONALISA2>> projec
 
 The results contain inputs, contributions, and insights from DMA and project partners.
 
-This paper documents the process and the the results, by
+This paper documents the process and the results, by
 
 . defining the domain problem,
 . setting the scope of work,
@@ -101,14 +105,37 @@ Some of the vessels are aware of some of the other vessels' tactical voyageplans
 
 As any coordinating organization the coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages, so that it can maintain an updated real-time picture of the current traffic situation.
 
+As part of <<ARCH>> vessels are also required to publish their Dynamic Voyage Plan to STCC when it has been changed and safety checked.
+
 [[img-controlled-area]]
-.A controlled area and five vessels showing their intended routes. There are vessels outside (1, 2) and vessels inside (3-5) the controleld area. A vessel (2) is entering, a vessel is leaving (3), and two vessels are staying (4 ,5).
+.A controlled area and five vessels showing their intended routes. There are vessels outside (1, 2) and vessels inside (3-5) the controlled area. A vessel (2) is entering, a vessel is leaving (3), and two vessels are staying (4 ,5).
 image::images/controlled_area.png[img-controlled-area, align="center"]
 
 ==== Autonomous flow management
 It has previously been observed in simulator trials, that given the information about the more detailed intentions of other vessels, and the ability to express own tactical plan to peer vessels, navigators quickly adapt to utilizing this mechanism, to clearly express own intention in a narrow passage situation.
 
 Autonomous flow management is thus anticipated to evolve out of the availability of information, that enable navigation systems to better predict realistic CPA and TCPA values and pinpoint likely critical passages at larger distances and longer timewindows, based on sharing the information on the tactical routes of peer vessels.
+
+
+==== Maritime Cloud
+
+The Maritime Cloud <<MARCLOUD>> is defined as “A communication framework enabling efficient, secure, reliable and seamless electronic information exchange 
+between all authorized maritime stakeholders across available communication systems” and contains
+
+. A Maritime Identify Registry
+. A Maritime Service Portfolio Registry
+. A Maritime Messaging Service (MMS)
+
+[[img-mar-cloud]]
+.The Maritime Messaging Service enable vessels and stakeholders to provide services in a secure exchange
+image::images/maritimecloud.png[img-mar-cloud, align="center"]
+
+Vessels, STCC and other stakeholders may enable a service by providing an _endpoint_ which can be queried. Requests may be initiated from any stakeholder by invocation of the _endpoint_.
+
+Vessels, STCC and other stakeholders may also choose to _broadcast_ a set of messages. Messages may be geo-located to a specific area.
+
+Service endpoints and broadcast messages are described in a specific Maritime Service Descriptor Language (MSDL).
+
 
 === Scope of work
 The scope of the work in this paper is _controlled flow management in a limited area (in order of size as a VTS area) based on flow management suggestions in the speed-based form_.
@@ -120,7 +147,10 @@ Design criteria and specific design proposals will be described for messages  an
 [[use_cases]]
 == Use cases
 
-=== Use case: Vessel enters the controlled area
+Given the transmission media there are two sets of use cases depending on the choice of either AIS or MMS based messaging
+
+{set:case:1}
+=== Use case (AIS-{counter:case}): Vessel enters the controlled area
 
 {set:step:0}
 [cols="1,5,5"]
@@ -139,7 +169,7 @@ Design criteria and specific design proposals will be described for messages  an
 |===
 
 [[use_case_cc_emits_fmm]]
-=== Use case: Coordination centre determines new flow management suggestion s needed
+=== Use case (AIS-{counter:case}): Coordination centre determines new flow management suggestion s needed
 
 {set:step:0}
 [cols="1,5,5"]
@@ -155,7 +185,7 @@ Design criteria and specific design proposals will be described for messages  an
 |===
 
 [[use_case_vessel_emits_tvp]]
-=== Use case: Vessel autonomously broadcasts its tactical voyageplan
+=== Use case (AIS-{counter:case}): Vessel autonomously broadcasts its tactical voyageplan
 
 {set:step:0}
 [cols="1,5,5"]
@@ -169,7 +199,7 @@ Design criteria and specific design proposals will be described for messages  an
 | The coordination center engages into <<use_case_cc_emits_fmm>>.
 |===
 
-=== Use case: Vessel cancels its tactical voyageplan
+=== Use case (AIS-{counter:case}): Vessel cancels its tactical voyageplan
 
 {set:step:0}
 [cols="1,5,5"]
@@ -183,7 +213,7 @@ Design criteria and specific design proposals will be described for messages  an
 | The coordination center engages into <<use_case_cc_emits_fmm>>.
 |===
 
-=== Use case: A vessel inquiries about the tactical voyageplan of another vessel
+=== Use case (AIS-{counter:case}): A vessel inquiries about the tactical voyageplan of another vessel
 
 {set:step:0}
 [cols="1,5,5"]
@@ -198,6 +228,43 @@ a) has he never received the tactical voyageplan of another vessel footnote:[Thi
 |A coordination center receives the message.
 | The coordination center engages into <<use_case_cc_emits_fmm>>.
 |===
+
+{set:case:1}
+=== Use case (MMS-{counter:case}): Requesting a tactical voyage plan
+
+{set:step:0}
+[cols="1,5"]
+.Use case.
+|===
+| No. | Action
+| {counter:step} | The STCC detects that a vessel approaches or has already entered the controlled area.
+| {counter:step} | The vessel receives a request for a tactical voyage plan.
+The request specifies the time interval of the tactical voyage plan as a configurable time window (Default five hours).
+| {counter:step} | The vessel check that it wish to communicate the tactical voyage plan with the requestor.
+| {counter:step} | The vessel responds with a tactical voyage plan.
+| *Exception*    | Requestor may not be a coordination centre. Vessel may choose not to disclose the tactical voyage plan.
+| *Exception*    | The vessel may not have a tactical voyage plan at present.
+|===
+
+=== Use case (MMS-{counter:case}): Vessel receive flow management suggestion
+
+{set:step:0}
+[cols="1,5"]
+|===
+| No. | Action
+| {counter:step} | The vessel receive a flow management suggestion from the coordination centre.
+| {counter:step} | The vessel acknowledge the receipt of the suggestion.
+| {counter:step} | The officer on watch (OOW) verify the proposal.
+.4+| {counter:step} | If the vessel accepts the proposal:
+                 | -- The vessel update the dynamic voyage plan if needed. Any changes to the route or schedule will result in an update being sent to the STCC.
+				 | -- The vessel respond with approval message.
+				 | -- The vessel starts broadcasting new tactical voyage plan via AIS.
+.2+| {counter:step} | If the vessel does not accept the proposal:
+                    | -- The vessel respond with a rejection message.				 
+| *Exception* | The vessel do not respond to the flow management suggestion.
+|===
+
+
 
 == Design criteria
 Messaging in the maritime domain has been available many years and communication standards have evolved and been added and augmented several times to accomodate the increasing demand for handling more and more complex scenarios in the maritime domain.
@@ -372,7 +439,7 @@ This shall be achieved by developing an open source reference implementation of 
 This shall be achieved by supplying example datagrams together with a human-readable decode of that datagram for each message variant.
 ====
 
-== Design of flow management message types and conversations
+== Design of flow management AIS message types and conversations
 
 === High-level design
 In the high-level design of flow management messages no assumptions are made about the characteristics of the underlying transport layer. Focus here is to identify which pieces of information need to be exchanged, between whom, and when. Following this are detailed specifications mapping this outcome to specific protocols, such as AIS <<AISSPEC5>>.
@@ -565,6 +632,160 @@ Appendix: <<tactical_voyageplan_broadcast>>
 |Flow management suggestion              | ASM DAC=219; FI=04 |Appendix: <<flow_management_suggestion>>.
 |===
 
+
+== Design of flow management MMS Message and Endpoint definition
+
+Communication in MMS is specified through endpoint and broadcasts. In order to support the use cases, there is currently no particular need for broadcast, so this chapter outlines the endpoint definitions as well as the message formats.
+
+Details of the service definitions is described in the Maritime Cloud Developer Guide, which is published online <<MARCLOUDDEV>>.
+
+=== MMS endpoints
+
+==== Tactical Voyage Plan Exchange
+
+One endpoint method is defined for an exchange of a tactical voyage plan.
+
+[[img-tvp-exchange]]
+.Requesting a Tactical Voyage Plan through defined endpoint.
+image::images/endpoint-tvp.png[img-tvp-exchange, align="center"]
+
+STCC, a ship or another entity may request a tactical voyage plan from the endpoint. The request must specify the amount of minutes into the near future for the voyage plan.
+
+The ship responds with the tactical voyage plan or rejects if it cannot comply.
+
+====
+Q? 
+
+* Should zero or negative timeWindow cause rejection or empty response or even default response? 
+* Is there a max time window to not call it tactical anymore?  
+* Can the ship just return a shorter timespan if it does not have/want to publish more?
+====
+
+In MSDL the endpoint definition should look like this:
+
+[source]
+.Endpoint definition in MSDL
+----
+include::{msdlfiles}/tacticalVoyagePlanExchange.msdl[tags=tvpendpoint]
+
+include::{msdlfiles}/tacticalVoyagePlanExchange.msdl[tags=tvpresponse]
+----
+
+The response include a tactical voyage plan and a message for any explanation.
+
+====
+Q?
+
+* What's the best way to signal errors or non-comply or limited-comply or other..?
+* Should we include a response type (ACCEPT | REJECT | something...)
+* Should we provide a unique identification of a tactical voyage plan (like a UUID, in case where we need to reference this specific tvp again)?
+====
+
+
+
+==== Flow Management Suggestion Exchange
+
+Two endpoint methods are defined for flow management suggestions. One method for posting the suggestion and another endpoint method for the response.
+
+[[img-flow-suggest]]
+.Suggesting a Tactical Voyage Plan through defined endpoint.
+image::images/endpoint-flow.png[img-flow-suggest, align="center"]
+
+
+The asynchronous nature of the conversation allows the vessel to verify the suggestion before deciding upon further action. 
+
+Similar to the tactical voyage plan exchange the interaction can be ship to ship and ship to shore. The ship to ship scenario would enable Autonomous flow management.
+
+The endpoints will be defined in MSDL like this:
+[source]
+.Endpoint definition in MSDL
+----
+include::{msdlfiles}/flowManagementSuggestion.msdl[tags=flowendpoint]
+----
+
+The request and response are both of particular types containing relevant information about the request and response.
+
+[source]
+----
+include::{msdlfiles}/flowManagementSuggestion.msdl[tags=flowRequest]
+----
+
+When a suggestion is submitted it contains apart from the tactical voyage plan a transaction identifier for parties to identify this particular request at a later time. The same identifier will be used in responses but also in case of re-transmission.
+
+The request also includes an optional message for the ship to understand the reason behind the suggestion.
+
+[source]
+----
+include::{msdlfiles}/flowManagementSuggestion.msdl[tags=flowResponse]
+----
+
+The response include the original transaction identifier from the request. It also includes a status of the suggestion request, most particularly if the request has been accepted or rejected.
+
+The return status of _PENDING_ can be used as an intermediate response in cases where a decision has not been met yet. The ship can implement an automated response with _status=PENDING_ at regular intervals.
+
+
+==== Tactical Voyage Plan
+
+The tactical voyage plan is a subset of the Dynamic Voyage Plan and contain route geometry and the near schedule.
+
+It is based on the defined format in <<ARCH>> - Appendix A, however, some optional fields have been omitted for the tactical scenario.
+
+A tactical voyage plan is returned by a ship when requested, but is also used for flow management suggestions. In the latter case the tactical voyage plan should be structural identical to the tactical voyage plan requested, but will differ only in the change content, such as waypoint position, speed, etd, eta, etc. 
+
+[source]
+----
+include::{msdlfiles}/tacticalVoyagePlan.msdl[tags=tvpmessage]
+----
+
+Each tactical voyage plan have a route name which is mandatory in the Dynamic Voyage Plan. Otherwise the message contains the route geometry as a list of waypoints and a schedule.
+
+The waypoints should be represented in order with the active waypoint as the first waypoint in the list.
+
+The schedule information defines the current schedule between endpoints and is sorted by time.
+
+
+===== Waypoint definition
+
+Each waypoint contains the following definition
+
+[source]
+----
+include::{msdlfiles}/tacticalVoyagePlan.msdl[tags=tvpwaypoint]
+----
+
+The waypoint ID refer to the waypoint ID from the Dynamic Voyage Plan. Each waypoint have a given position and a turn radius, when part of a direction change.
+
+All but the first waypoint should have a leg definition of the inbound leg.
+
+===== Leg definition
+
+Each leg contains the following definition
+
+[source]
+----
+include::{msdlfiles}/tacticalVoyagePlan.msdl[tags=tvpleg]
+----
+
+Each leg define the cross track distance in meters for starboard and port as well as the geometry type of the leg. Default geometry type is loxodrome.
+
+===== Schedule definition
+
+Each schedule contains the following definition
+
+[source]
+----
+include::{msdlfiles}/tacticalVoyagePlan.msdl[tags=tvpschedule]
+----
+
+Each schedule element contains a reference to the departing waypoint and the arriving waypoint, matching the identifier in the waypoint list.
+
+Schedules are defined in time order, which means that the calculated and the manual schedule elements of the Dynamic Voyage Plan is merged into one with a subsequent schedule type attached.
+
+The schedule contains an ETD of the departing waypoint as well as an ETA of the arriving waypoint. When there is no significant stop-over at a waypoint the ETD may be omitted and merely substituted by the ETA of the previous schedule.
+
+The schedule element also contains the speed over ground in knots as an easy indication of - but no substitution for - the arrival at the upcoming waypoint.
+
+
 [[design_validation]]
 == Validation against design criteria
 In this section the proposed messages are validated against the defined design criteria.
@@ -623,7 +844,26 @@ The total theoretical score is 2 × (16-2) = 28; the obtained score is 22. +
 *The design criteria compliance against AIS-specific design criteria is 79%*.
 
 === Validation of MSDL messages against design criteria
-...
+
+==== General design criteria
+
+{set:step:0}
+[cols="1,3,7,>1"]
+|===
+| No. | Criteria | Validation | Score
+| {counter:step} | Design for multivendor environment | The Maritime Cloud is designed for multivendor environments. | 2
+| {counter:step} | Information transfer involving ships must be bandwidth efficient |
+The exchanged messages can be long. However, most fields of the tactical voyage plan that were already optional have been omitted from the MSDL. For an STCC this information is available from other sources.| 1
+| {counter:step} | Ship-shore interactions must be robust | Messaging in the Maritime Cloud is inherently robus. | 2
+| {counter:step} |Ship-shore data IP connections must be initiated from ship | Although MMS provide no direct dependency on IP it does mandate connections to be initated from the ship at any time. | 2
+| {counter:step} | Indication of trust | Trust are designed into the Maritime Cloud in the Maritime Identity Register as well as into the MMS caller context | 2
+|
+|===
+
+The total theoretical score is 2 × 5 = 10; the obtained score is 9. +
+*The design criteria compliance against general design criteria is 90%*.
+
+
 
 == Test data
 The test data pairs listed in this section are calculated (and can be validated) as described in the appendix: <<compute_test_data_pairs>>.
@@ -1390,17 +1630,22 @@ Thus -- this particular case -- the checksum is 0x08 and thus the complete NMEA 
 |===
 |Abbreviation |Expansion | Description
 
-|MSDL |Maritime Service Definition Language | A computer language used to defined services in a maritime
+|MSDL |Maritime Service Definition Language | A computer language used to defined services in the maritime cloud
+|MMS |Maritime Messaging Service | Exchange of messages through the maritime cloud 
+
 |AIS |Automatic Identification System |A tracking system used on ships and by vessel traffic services for identifying and locating vessels by electronically exchanging data with other nearby ships, base stations, and satellites.
 |ASM |Application Specific Message |Used only in the context of the automatic identification system, as a method of allowing "competent authorities" to define additional AIS message subtypes, based on message types 6, 8, 25, and 26 which support a custom payload.
 |CC | Coordination Center |A term specific to this document invented to cover all types of VTS, STCC, and other centres with responsibility for traffic management and coordination.
 |STM |Sea Traffic Management |The aggregation of the seaborne and shore-based functions (sea traffic services, maritime space management and sea traffic flow management) required to ensure the safe and efficient manouvering of vessels during all phases of operation.
 |STCC |Sea Traffic Coordination Center |A central, shore-based, hub maintaining record of all vessels at sea using AIS and/or radar to enable managed distribution of vessel routes between ship-to-ship and ship-to-shore.
 |VTS |Vessel traffic service |A vessel traffic service is a marine traffic monitoring system established by public or port authorities, somewhat similar to air traffic control for aircraft.
-|IALA |International Association of Lighthouse Authorities |The International Association of Marine Aids to Navigation and Lighthouse Authorities is a non-profit organization founded collect and provide nautical expertise and advice.
+|IALA |International Association of Lighthouse Authorities |The International Asso
+ciation of Marine Aids to Navigation and Lighthouse Authorities is a non-profit organization founded collect and provide nautical expertise and advice.
 |ITU |International Telecommunication Union |The International Telecommunication Unio is an agency of the United Nations that is responsible for issues that concern information and communication technologies, such as coordinating the shared global use of the radio spectrum, promoting international cooperation in assigning satellite orbits, assisting in the development of worldwide technical standards.
 |ASCII |American Standard Code for Interformation Interchange | A character encoding scheme used in computers, communications equipment, and other devices that use text, to represent text with numbers.
 |ETA |Estimated time of arrival |-
+|ETD |Estimated time of departure |-
+|OOW |Officer on watch |-
 |SOG |Speed over ground |Speed made good (often measured in knots).
 |TCR |Turn circle radius| Turning circle radius (often measured in nautical miles).
 |===
@@ -1436,6 +1681,10 @@ Thus -- this particular case -- the checksum is 0x08 and thus the complete NMEA 
 [[[BDEC]]] "bdec". A set of tools for creating decoders and encoders for binary files given a high level specification. http://www.protocollogic.com/docs/tutorial.html.
 
 [[[MONALISA2]]] "MONALISA 2.0". A joint project from 10 different countries in the European Union to introduce Sea Traffic Management (STM) and make real-time information available to all interested and authorised parties in the maritime world. http://monalisaproject.eu/.
+
+[[[MARCLOUD]]] Maritime Cloud. A framework consisting of standards, infrastructure and governance that fascilitate secure interoperable information exchange between stakeholders in the maritime community using the principles of Service Oriented Architectures. http://www.maritimecloud.net/.
+
+[[[MARCLOUDDEV]]] Marimtime Cloud Developer Guide. A guide for developers using the maritime cloud. Also includes a section on current MSDL. http://dev.maritimecloud.net/devguide/index.html#mms-and-services.
 
 [[[ASMCOLL]]] "Application Specific Messages". A collection of application specific AIS messages approved by IALA-AISM. http://www.e-navigation.nl/asm.
 

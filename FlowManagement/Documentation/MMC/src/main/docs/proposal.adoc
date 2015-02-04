@@ -92,7 +92,7 @@ Vessels inside the controlled area can be in states
 
 Some of the vessels are aware of some of the other vessels tactical voyage plans, and the coordination centre is aware of some of the vessels tactical voyage plans.
 
-As part of [[ARCH]] vessels are required to publish their Dynamic Voyage Plan to STCC when it has been changed and safety checked.
+
 
 The coordination centre is continuously receiving an AIS data stream, including type 1-3 position messages and type 5 ship and static voyage messages, so that it can maintain an updated real-time picture of the current traffic situation. 
 
@@ -142,7 +142,6 @@ The use cases presented in this chapter are specified in <<ARCH>> chapter 10 - C
 are all made available through MMS.
 
 ==== Use case: Requesting a tactical voyage plan
-
 
 {set:step:0}
 [cols="1,5"]
