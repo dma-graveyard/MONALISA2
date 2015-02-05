@@ -6,19 +6,26 @@ This is a plugin component for EPD
 
 Must be embedded inside an EPD installation.
 
-For ship components, edit <homepath>/epd-ship.properties and set the plugin properties
-For ship components, edit <homepath>/epd-ship.properties and set the plugin properties
 
-	- epd.plugin_components       - Add the component name (name reused for class)
+
+For ship components, edit <homepath>/epd-ship.properties and set the plugin path
+For shore components, edit <homepath>/epd-shore.properties and set the plugin path
+
 	- epd.plugin_classpath        - Add this jar file to the path. Delimit with : or ; depending on platform
-	- component.name.class        - Add the class name of the component
+	
 
 ## Components
 
+### Ship components
 
-### epd.ship.monalisa.tvp
+#### monalisa.tvp
 
-Implement the Tactical Voyage Plan endpoint in the ship.
+Implements the Tactical Voyage Plan endpoint in the ship.
 
 Implementing class :
      **dk.dma.epd.ship.monalisa2.TacticalVoyagePlanExchangeHandler**
+
+### Shore components
+
+TBD - To Be Developed
+
