@@ -3,11 +3,14 @@ package dk.dma.epd;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import dma.route.AbstractTacticalRouteReplyEndpoint;
+import dma.route.TacticalRouteSuggestionReply;
 import eu.monalisaproject.TacticalVoyagePlan;
 import eu.monalisaproject.TacticalVoyagePlanEndpoint;
 import eu.monalisaproject.TacticalVoyagePlanResponse;
 import net.maritimecloud.core.id.MaritimeId;
 import net.maritimecloud.net.EndpointInvocationFuture;
+import net.maritimecloud.net.MessageHeader;
 import net.maritimecloud.net.mms.MmsClient;
 import net.maritimecloud.net.mms.MmsClientConfiguration;
 import net.maritimecloud.util.geometry.PositionReader;
@@ -45,6 +48,27 @@ public class Main {
         
         // Now find the ship
         String mmsi = (args.length > 0) ? args[0] : "414000285";
+
+        registerForSuggestionResponse(client);
+        tacticalVoyagePlanExchange(mmsi, client);
+        
+        
+        //Disconnect
+        client.close();
+        client.awaitTermination(10, TimeUnit.SECONDS);
+    }
+
+    private static void registerForSuggestionResponse(MmsClient client) throws InterruptedException {
+        client.endpointRegister(new AbstractTacticalRouteReplyEndpoint() {
+            protected void sendRouteSuggestionReply(MessageHeader header, TacticalRouteSuggestionReply reply) {
+                System.out.println("Received a reply from" + header.getSender());
+                System.out.println("Regarding transaction " + reply.getId());
+                System.out.println("Response is " + reply.getStatus() + " - " + reply.getReplyText());
+            }
+        }).awaitRegistered(5, TimeUnit.SECONDS);
+    }
+
+    private static void tacticalVoyagePlanExchange(String mmsi, MmsClient client) throws InterruptedException, ExecutionException {
         
         TacticalVoyagePlanEndpoint endpoint = client.endpointCreate(MaritimeId.create("mmsi:" + mmsi), TacticalVoyagePlanEndpoint.class);
         
@@ -58,9 +82,5 @@ public class Main {
         if (plan != null) {
             System.out.println("Route is called " + plan.getRouteName());
         }
-        
-        //Disconnect
-        client.close();
-        client.awaitTermination(10, TimeUnit.SECONDS);
     }
 }
